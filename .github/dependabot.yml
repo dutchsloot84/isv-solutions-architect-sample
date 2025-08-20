@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/services/partner-app"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "npm"
+    directory: "/services/integration-hub"
+    schedule:
+      interval: "monthly"
+  - package-ecosystem: "npm"
+    directory: "/services/salesforce-mock"
+    schedule:
+      interval: "monthly"

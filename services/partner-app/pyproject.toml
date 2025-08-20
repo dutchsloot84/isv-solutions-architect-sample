@@ -1,0 +1,17 @@
+[project]
+name = "partner-app"
+version = "0.1.0"
+description = "Sample partner app"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "sqlalchemy",
+  "alembic",
+  "google-cloud-pubsub",
+  "prometheus_client"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
