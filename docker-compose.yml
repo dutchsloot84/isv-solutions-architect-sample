@@ -1,0 +1,34 @@
+version: '3'
+services:
+  pubsub:
+    image: gcr.io/google.com/cloudsdktool/cloud-sdk:emulators
+    command: gcloud beta emulators pubsub start --project=demo --host-port=0.0.0.0:8085
+    ports:
+      - "8085:8085"
+  salesforce-mock:
+    build: ./services/salesforce-mock
+    ports:
+      - "3002:3002"
+  integration-hub:
+    build: ./services/integration-hub
+    environment:
+      PUBSUB_EMULATOR_HOST: pubsub:8085
+      GCP_PROJECT: demo
+      SALESFORCE_BASE_URL: http://salesforce-mock:3002
+      ORDERS_SUB: orders-sub
+    depends_on:
+      - pubsub
+      - salesforce-mock
+    ports:
+      - "3001:3001"
+  partner-app:
+    build: ./services/partner-app
+    environment:
+      PUBSUB_EMULATOR_HOST: pubsub:8085
+      GCP_PROJECT: demo
+      ORDERS_TOPIC: orders
+      DATABASE_URL: sqlite:///./partner.db
+    depends_on:
+      - pubsub
+    ports:
+      - "8000:8000"

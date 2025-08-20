@@ -1,0 +1,7 @@
+{
+  "name": "isv-solutions-architect-sample",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "partner-app",
+  "workspaceFolder": "/workspace/isv-solutions-architect-sample",
+  "extensions": ["ms-python.python", "dbaeumer.vscode-eslint"]
+}

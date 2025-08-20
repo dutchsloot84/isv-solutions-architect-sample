@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install deps
+        run: |
+          pip install pre-commit
+          pre-commit install-hooks
+          npm install --prefix services/integration-hub
+          npm install --prefix services/salesforce-mock
+      - name: Run pre-commit
+        run: pre-commit run --show-diff-on-failure --all-files
+      - name: Test Partner App
+        run: |
+          pip install -r services/partner-app/requirements-test.txt || true
+          pytest services/partner-app/tests
+      - name: Test Integration Hub
+        run: npm test --prefix services/integration-hub
+      - name: Test Salesforce Mock
+        run: npm test --prefix services/salesforce-mock
