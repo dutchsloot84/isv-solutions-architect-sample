@@ -32,8 +32,9 @@ def create_order(
     order: dict,
     db: Session = Depends(get_db),
     idempotency_key: str = Header(..., alias="Idempotency-Key"),
-    correlation_id: str
-    | None = Header(default=None, alias="X-Correlation-ID"),
+    correlation_id: str | None = Header(
+        default=None, alias="X-Correlation-ID"
+    ),
 ):
     REQUEST_COUNT.inc()
     if correlation_id is None:
