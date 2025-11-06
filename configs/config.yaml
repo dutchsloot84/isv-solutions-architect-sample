@@ -20,7 +20,7 @@
       "snapshot_dir": "data/snapshots",
       "logs_dir": "data/logs",
       "reports_dir": "reports",
-      "prompts_dir": "prompts",
+      "prompts_dir": "docs/prompts",
     },
   "reporting": { "timezone": "UTC", "report_template": "default" },
 }

@@ -27,17 +27,17 @@ except ImportError:
 
 def project_root() -> Path:
     """Return the root directory for the release snapshot manager project."""
-    return Path(__file__).resolve().parents[3]
+    return Path(__file__).resolve().parents[2]
 
 
 def module_root() -> Path:
     """Return the module root directory inside the repository."""
-    return Path(__file__).resolve().parents[2]
+    return Path(__file__).resolve().parents[1]
 
 
 def config_path() -> Path:
     """Return the default configuration file path."""
-    return module_root() / "configs" / "config.yaml"
+    return project_root() / "configs" / "config.yaml"
 
 
 def load_config(override_path: Optional[Path | str] = None) -> Dict[str, Any]:

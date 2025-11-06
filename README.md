@@ -39,7 +39,7 @@ pip install -r requirements.txt
 Run the authorization flow locally. This launches a browser window where you can complete the Jira login and grant permissions.
 
 ```bash
-python -m release_snapshot_manager.modules.utils.oauth authorize
+python -m modules.utils.oauth authorize
 ```
 
 This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `~/.jira_token.json`).
@@ -49,7 +49,7 @@ This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `
 Generate or update a release snapshot and readiness report for a fix version.
 
 ```bash
-python release_snapshot_manager/main.py --fixVersion "Mobilitas 2025.11.14"
+python main.py --fixVersion "Mobilitas 2025.11.14"
 ```
 
 Use the `--update` flag to refresh the snapshot even if one exists for today.
