@@ -17,8 +17,8 @@
     },
   "paths":
     {
-      "snapshot_dir": "data/snapshots",
-      "logs_dir": "data/logs",
+      "snapshot_dir": "snapshots",
+      "logs_dir": "logs",
       "reports_dir": "reports",
       "prompts_dir": "docs/prompts",
     },

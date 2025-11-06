@@ -93,9 +93,8 @@ def create_markdown_report(delta_path: Path | str) -> Path:
     generated_date = generated_at.strftime("%b %d, %Y")
     file_date = generated_at.strftime("%Y%m%d")
 
-    prompt_dir = Path(__file__).resolve().parents[1] / config["paths"].get(
-        "prompts_dir", "prompts"
-    )
+    prompt_dir_setting = config["paths"].get("prompts_dir", "prompts")
+    prompt_dir = Path(__file__).resolve().parents[1] / prompt_dir_setting
     prompt_text = _load_prompt(prompt_dir)
 
     counts: Dict[str, int] = delta.get("counts", {})
@@ -113,10 +112,11 @@ def create_markdown_report(delta_path: Path | str) -> Path:
             delta, counts, items, prompt_text, generated_date
         )
 
-    reports_dir = helpers.ensure_directory(
-        Path(__file__).resolve().parents[1]
-        / config["paths"].get("reports_dir", "reports")
-    )
+    reports_dir_setting = config["paths"].get("reports_dir", "reports")
+    reports_dir_path = Path(reports_dir_setting)
+    if not reports_dir_path.is_absolute():
+        reports_dir_path = helpers.artifact_path(reports_dir_setting)
+    reports_dir = helpers.ensure_directory(reports_dir_path)
     report_path = reports_dir / f"readiness_report_{file_date}.md"
     report_path.write_text(markdown, encoding="utf-8")
     LOGGER.info("Readiness report created at %s", report_path)

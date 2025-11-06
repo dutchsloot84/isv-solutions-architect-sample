@@ -102,9 +102,11 @@ def _categorize(
 def generate_delta() -> Tuple[Path, Dict[str, List[Dict]]]:
     """Compare the latest snapshots and return a delta summary."""
     config = helpers.load_config()
-    snapshot_dir = Path(__file__).resolve().parents[1] / config["paths"].get(
-        "snapshot_dir", "data/snapshots"
-    )
+    snapshot_dir_setting = config["paths"].get("snapshot_dir", "snapshots")
+    snapshot_dir_path = Path(snapshot_dir_setting)
+    if not snapshot_dir_path.is_absolute():
+        snapshot_dir_path = helpers.artifact_path(snapshot_dir_setting)
+    snapshot_dir = helpers.ensure_directory(snapshot_dir_path)
     latest_files = helpers.latest_snapshot_files(snapshot_dir, limit=2)
 
     if not latest_files:

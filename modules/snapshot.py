@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Dict, List
 
@@ -32,10 +31,12 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
     """Fetch Jira issues filtered by fixVersion and persist them as a snapshot."""
     config = helpers.load_config()
     tz = config.get("reporting", {}).get("timezone")
-    snapshot_dir = helpers.ensure_directory(
-        Path(__file__).resolve().parents[1]
-        / config["paths"].get("snapshot_dir", "data/snapshots")
-    )
+
+    snapshot_dir_setting = config["paths"].get("snapshot_dir", "snapshots")
+    snapshot_path = Path(snapshot_dir_setting)
+    if not snapshot_path.is_absolute():
+        snapshot_path = helpers.artifact_path(snapshot_dir_setting)
+    snapshot_dir = helpers.ensure_directory(snapshot_path)
 
     deployment_field = config["project"].get(
         "deployment_notes_field", "customfield_12345"
@@ -50,7 +51,8 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
             "fields": ",".join(config["jira"].get("jql_fields", [])),
             "maxResults": 500,
         }
-        verify_path = os.getenv("REQUESTS_CA_BUNDLE")
+        verify_path_obj = helpers.ssl_verify_path()
+        verify_path = str(verify_path_obj) if verify_path_obj else True
         response = session.get(
             f"{base_url}/rest/api/3/search",
             params=params,

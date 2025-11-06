@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover - optional dependency fallback
+    load_dotenv = None  # type: ignore[assignment]
+
+try:
     import yaml
 except ImportError:
     import json as _json
@@ -40,8 +45,54 @@ def config_path() -> Path:
     return project_root() / "configs" / "config.yaml"
 
 
+def load_environment(dotenv_path: Optional[Path | str] = None) -> None:
+    """Load environment variables from a .env file when available."""
+
+    if load_dotenv is None:
+        return
+
+    resolved = (
+        Path(dotenv_path).expanduser()
+        if dotenv_path
+        else project_root() / ".env"
+    )
+    if resolved.exists():
+        load_dotenv(dotenv_path=resolved)  # type: ignore[arg-type]
+
+
+def artifact_root() -> Path:
+    """Return the base artifact directory, defaulting to the project data folder."""
+
+    root = os.getenv("ARTIFACT_ROOT")
+    if root:
+        path = Path(root).expanduser().resolve()
+    else:
+        path = project_root() / "data"
+    ensure_directory(path)
+    return path
+
+
+def artifact_path(*parts: str | os.PathLike[str]) -> Path:
+    """Construct a path rooted at the artifact directory."""
+
+    return artifact_root().joinpath(*parts)
+
+
+def ssl_verify_path() -> Optional[Path]:
+    """Return the SSL certificate bundle path from environment variables."""
+
+    cert_path = os.getenv("SSL_CERT_PATH") or os.getenv("REQUESTS_CA_BUNDLE")
+    if not cert_path:
+        return None
+
+    resolved = resolve_path(cert_path)
+    os.environ.setdefault("REQUESTS_CA_BUNDLE", str(resolved))
+    return resolved
+
+
 def load_config(override_path: Optional[Path | str] = None) -> Dict[str, Any]:
     """Load YAML configuration and override with environment variables when present."""
+    load_environment()
     config_file = Path(override_path) if override_path else config_path()
     if not config_file.exists():
         raise FileNotFoundError(
