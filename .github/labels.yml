@@ -1,0 +1,15 @@
+- name: bug
+  color: D73A4A
+  description: Something isn't working
+- name: enhancement
+  color: A2EEEF
+  description: New feature or request
+- name: documentation
+  color: 0075CA
+  description: Improvements or additions to documentation
+- name: codex
+  color: 5319E7
+  description: Codex-generated or assisted changes
+- name: chore
+  color: FEF2C0
+  description: Maintenance and cleanup tasks

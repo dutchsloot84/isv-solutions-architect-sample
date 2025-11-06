@@ -1,0 +1,22 @@
+name: Move Issue to Done on Merge
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  issues: write
+  pull-requests: read
+  repository-projects: write
+
+jobs:
+  move_issue:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Move linked issues to Done
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/dutchsloot84/projects/5
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          field: Status
+          field-value: Done

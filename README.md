@@ -39,7 +39,7 @@ pip install -r requirements.txt
 Run the authorization flow locally. This launches a browser window where you can complete the Jira login and grant permissions.
 
 ```bash
-python -m release_snapshot_manager.modules.utils.oauth authorize
+python -m modules.utils.oauth authorize
 ```
 
 This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `~/.jira_token.json`).
@@ -49,7 +49,7 @@ This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `
 Generate or update a release snapshot and readiness report for a fix version.
 
 ```bash
-python release_snapshot_manager/main.py --fixVersion "Mobilitas 2025.11.14"
+python main.py --fixVersion "Mobilitas 2025.11.14"
 ```
 
 Use the `--update` flag to refresh the snapshot even if one exists for today.
@@ -71,3 +71,15 @@ Use the `--update` flag to refresh the snapshot even if one exists for today.
 - Follow PEP 8 style guidelines.
 - Never log secrets or raw access tokens.
 - All outbound HTTPS requests must verify certificates using `REQUESTS_CA_BUNDLE`.
+
+## Continuous Integration
+
+GitHub Actions run automated checks on pushes to `main` and all pull requests. The active
+workflows include:
+
+- **Python CI** – installs dependencies, runs Ruff linting, and executes the pytest suite.
+- **Label Sync** – keeps repository labels aligned with `.github/labels.yml`.
+- **Weekly Summary** – publishes Friday progress summaries under `reports/`.
+
+No additional PR title validation or pre-commit automation runs in CI, keeping the
+pipeline focused on essential quality and reporting tasks.

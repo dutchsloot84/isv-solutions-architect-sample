@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Release Intelligence Support
+    url: https://github.com/dutchsloot84
+    about: Contact the maintainer for urgent production incidents.

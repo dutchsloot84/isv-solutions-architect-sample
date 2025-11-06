@@ -1,20 +1,33 @@
 ---
-name: Bug report
-about: Report a bug in the sample project
+name: "Bug Report"
+about: "Report a defect impacting release readiness automation"
+title: "[Bug] <concise summary>"
+labels: ["bug"]
+assignees: []
 ---
 
-**Describe the bug**
+## Overview
+Provide a quick summary of the defect and its impact.
 
-**To Reproduce**
+## Impact Assessment
+Describe how this issue affects release readiness, stakeholders, or downstream workflows.
 
-**Expected behavior**
+## Steps to Reproduce
+1. Go to '...'
+2. Click on '...'
+3. Observe '...'
 
-**Screenshots**
+## Expected Behavior
+Detail what should happen when the steps above are followed.
 
-**Environment (please complete the following information):**
+## Actual Behavior
+Explain what actually occurred, including error messages or incorrect outputs.
 
-- OS:
-- Node version:
-- Python version:
+## Logs & Attachments
+Add logs, screenshots, or reports that help illustrate the problem.
 
-**Additional context**
+## Urgency & Priority
+Indicate the business priority, SLAs, or deployment deadlines impacted by this defect.
+
+## Additional Context
+List related issues, recent changes, or other context that will help the triage team.
