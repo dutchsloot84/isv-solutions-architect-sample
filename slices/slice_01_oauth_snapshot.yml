@@ -1,0 +1,46 @@
+id: "01"
+name: "OAuth Snapshot Foundation"
+phase: "build"
+branch: "slice/01-oauth-snapshot"
+description: |
+  Establish OAuth 3LO authentication with corporate certificate validation and
+  provide a snapshot export utility to capture OAuth configuration for auditing.
+dependencies: []
+project:
+  github_project_id: 5
+  status_field: "Status"
+  fix_version_field: "Fix Version"
+  default_status: "Analyze"
+tasks:
+  - id: analyze
+    title: "Map existing authentication and configuration surface"
+    details: |
+      Audit the repository for OAuth, dotenv, logging, and SSL handling gaps.
+      Document required configuration values and certificate bundle expectations.
+      Identify modules requiring refactors or new implementations.
+    artifacts:
+      - "${ARTIFACT_ROOT}/01/analysis/oauth_surface_<timestamp>.md"
+  - id: execute
+    title: "Implement OAuth 3LO with snapshot writer"
+    details: |
+      Introduce OAuth 3-legged authorization with corporate CA verification using
+      `${SSL_CERT_PATH}`. Implement configuration loading via dotenv support and
+      structured logging for authentication flows. Create a snapshot writer that
+      persists OAuth metadata to JSON under `${ARTIFACT_ROOT}/snapshots/`.
+    artifacts:
+      - "${ARTIFACT_ROOT}/01/implementation/oauth_modules_<timestamp>.md"
+      - "${ARTIFACT_ROOT}/snapshots/snapshot_<timestamp>.json"
+  - id: validate
+    title: "Run tests and confirm snapshot output"
+    details: |
+      Execute pytest and lint suites. Validate that an OAuth snapshot JSON file is
+      produced with secrets masked. Prepare pull request summary aligned with
+      Slice 01 acceptance criteria.
+    artifacts:
+      - "${ARTIFACT_ROOT}/01/validation/test_results_<timestamp>.txt"
+      - "${ARTIFACT_ROOT}/01/validation/snapshot_verification_<timestamp>.md"
+success_criteria:
+  - OAuth 3LO flow established with certificate verification via `${SSL_CERT_PATH}`.
+  - Snapshot writer produces masked JSON output at `${ARTIFACT_ROOT}/snapshots/`.
+  - Pytest and lint checks pass without regressions.
+  - Project board entry updated to Ready for Review with artifact links.
