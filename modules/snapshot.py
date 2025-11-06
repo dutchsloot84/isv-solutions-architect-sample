@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from .utils import helpers
+from .utils.http_retry import request_with_retry
 from .utils.logger import get_logger
 from .utils.oauth import get_jira_session
 from src.validation import filter_valid_issues
@@ -54,7 +55,9 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
         }
         verify_path_obj = helpers.ssl_verify_path()
         verify_path = str(verify_path_obj) if verify_path_obj else True
-        response = session.get(
+        response = request_with_retry(
+            session,
+            "GET",
             f"{base_url}/rest/api/3/search",
             params=params,
             verify=verify_path,
