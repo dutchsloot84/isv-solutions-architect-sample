@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Jira Issue",
+  "type": "object",
+  "required": ["key", "summary", "status", "fixVersions"],
+  "properties": {
+    "key": {"type": "string"},
+    "summary": {"type": ["string", "null"]},
+    "status": {"type": ["string", "null"]},
+    "fixVersions": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "deployment_notes": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}

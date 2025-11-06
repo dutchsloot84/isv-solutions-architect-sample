@@ -8,6 +8,7 @@ from typing import Dict, List
 from .utils import helpers
 from .utils.logger import get_logger
 from .utils.oauth import get_jira_session
+from src.validation import filter_valid_issues
 
 
 LOGGER = get_logger(__name__)
@@ -60,10 +61,10 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
         )
         response.raise_for_status()
         data = response.json()
-        issues = [
+        issues = filter_valid_issues(
             _build_issue_payload(issue, deployment_field)
             for issue in data.get("issues", [])
-        ]
+        )
         LOGGER.info(
             "Fetched %s issues from Jira for fixVersion %s",
             len(issues),
@@ -73,22 +74,24 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
         Exception
     ) as error:  # noqa: BLE001 - we want to provide friendly fallback
         LOGGER.warning("Falling back to mock data due to API error: %s", error)
-        issues = [
-            {
-                "key": "ABC-1",
-                "summary": "Mock issue one",
-                "status": "In Progress",
-                "fixVersions": [fix_version],
-                "deployment_notes": "Initial deployment notes",
-            },
-            {
-                "key": "ABC-2",
-                "summary": "Mock issue two",
-                "status": "Done",
-                "fixVersions": [fix_version],
-                "deployment_notes": "Mock notes",
-            },
-        ]
+        issues = filter_valid_issues(
+            [
+                {
+                    "key": "ABC-1",
+                    "summary": "Mock issue one",
+                    "status": "In Progress",
+                    "fixVersions": [fix_version],
+                    "deployment_notes": "Initial deployment notes",
+                },
+                {
+                    "key": "ABC-2",
+                    "summary": "Mock issue two",
+                    "status": "Done",
+                    "fixVersions": [fix_version],
+                    "deployment_notes": "Mock notes",
+                },
+            ]
+        )
 
     timestamp = helpers.timestamp_for_filename(tz)
     snapshot_path = snapshot_dir / f"snapshot_{timestamp}.json"

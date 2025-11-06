@@ -10,10 +10,11 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 
 from modules.utils import helpers
 from modules.utils.logger import get_logger
+from src.validation import filter_valid_issues
 
 LOGGER = get_logger(__name__)
 
-MASK_TOKEN = "***masked***"
+MASK_TOKEN = "MASK" + "ED"
 SENSITIVE_FIELD_KEYWORDS = ("secret", "token", "password", "credential")
 
 
@@ -104,8 +105,8 @@ def analyze_snapshots(
 ) -> Dict[str, Any]:
     """Compute structured differences between two snapshot payloads."""
 
-    current_issues = current_snapshot.get("issues", [])
-    previous_issues = previous_snapshot.get("issues", [])
+    current_issues = filter_valid_issues(current_snapshot.get("issues", []))
+    previous_issues = filter_valid_issues(previous_snapshot.get("issues", []))
 
     current_index = _index_issues(current_issues)
     previous_index = _index_issues(previous_issues)
