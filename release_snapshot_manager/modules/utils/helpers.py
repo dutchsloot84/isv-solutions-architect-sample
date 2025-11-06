@@ -44,7 +44,9 @@ def load_config(override_path: Optional[Path | str] = None) -> Dict[str, Any]:
     """Load YAML configuration and override with environment variables when present."""
     config_file = Path(override_path) if override_path else config_path()
     if not config_file.exists():
-        raise FileNotFoundError(f"Configuration file not found at {config_file}")
+        raise FileNotFoundError(
+            f"Configuration file not found at {config_file}"
+        )
 
     with config_file.open("r", encoding="utf-8") as stream:
         config = yaml.safe_load(stream) or {}
@@ -116,7 +118,9 @@ def read_json(path: Path | str) -> Dict[str, Any]:
         return json.load(handle)
 
 
-def latest_snapshot_files(snapshot_dir: Path | str, limit: int = 2) -> list[Path]:
+def latest_snapshot_files(
+    snapshot_dir: Path | str, limit: int = 2
+) -> list[Path]:
     """Return the most recent snapshot files sorted newest-first."""
     directory = Path(snapshot_dir)
     snapshots = sorted(directory.glob("snapshot_*.json"), reverse=True)

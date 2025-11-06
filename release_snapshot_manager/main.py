@@ -16,7 +16,9 @@ def run(fix_version: str, force_update: bool = False) -> None:
     tz = config.get("reporting", {}).get("timezone")
     logger = get_logger(__name__)
 
-    snapshot_dir = Path(__file__).resolve().parent / config["paths"].get("snapshot_dir", "data/snapshots")
+    snapshot_dir = Path(__file__).resolve().parent / config["paths"].get(
+        "snapshot_dir", "data/snapshots"
+    )
     helpers.ensure_directory(snapshot_dir)
 
     current_date = helpers.current_timestamp(tz).strftime("%Y%m%d")
@@ -27,7 +29,10 @@ def run(fix_version: str, force_update: bool = False) -> None:
         try:
             latest_data = helpers.read_json(latest_path)
             file_date = latest_path.stem.replace("snapshot_", "")[:8]
-            if latest_data.get("fixVersion") == fix_version and file_date == current_date:
+            if (
+                latest_data.get("fixVersion") == fix_version
+                and file_date == current_date
+            ):
                 issues = latest_data.get("issues", [])
                 logger.info("Reusing existing snapshot %s", latest_path.name)
                 reuse_snapshot = True
@@ -62,15 +67,23 @@ def run(fix_version: str, force_update: bool = False) -> None:
         "still_open": counts.get("still_open", 0),
         "notes": report_path.name,
     }
-    logs_dir = Path(__file__).resolve().parent / config["paths"].get("logs_dir", "data/logs")
+    logs_dir = Path(__file__).resolve().parent / config["paths"].get(
+        "logs_dir", "data/logs"
+    )
     helpers.append_csv_row(logs_dir / "run_log.csv", run_metadata)
     logger.info("Run metadata appended to %s", logs_dir / "run_log.csv")
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Generate Jira release readiness snapshots")
-    parser.add_argument("--fixVersion", required=True, help="Fix version to evaluate")
-    parser.add_argument("--update", action="store_true", help="Force snapshot refresh")
+    parser = argparse.ArgumentParser(
+        description="Generate Jira release readiness snapshots"
+    )
+    parser.add_argument(
+        "--fixVersion", required=True, help="Fix version to evaluate"
+    )
+    parser.add_argument(
+        "--update", action="store_true", help="Force snapshot refresh"
+    )
     return parser.parse_args()
 
 

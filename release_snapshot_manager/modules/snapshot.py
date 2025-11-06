@@ -33,10 +33,13 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
     config = helpers.load_config()
     tz = config.get("reporting", {}).get("timezone")
     snapshot_dir = helpers.ensure_directory(
-        Path(__file__).resolve().parents[1] / config["paths"].get("snapshot_dir", "data/snapshots")
+        Path(__file__).resolve().parents[1]
+        / config["paths"].get("snapshot_dir", "data/snapshots")
     )
 
-    deployment_field = config["project"].get("deployment_notes_field", "customfield_12345")
+    deployment_field = config["project"].get(
+        "deployment_notes_field", "customfield_12345"
+    )
 
     try:
         session = get_jira_session()
@@ -55,9 +58,18 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
         )
         response.raise_for_status()
         data = response.json()
-        issues = [_build_issue_payload(issue, deployment_field) for issue in data.get("issues", [])]
-        LOGGER.info("Fetched %s issues from Jira for fixVersion %s", len(issues), fix_version)
-    except Exception as error:  # noqa: BLE001 - we want to provide friendly fallback
+        issues = [
+            _build_issue_payload(issue, deployment_field)
+            for issue in data.get("issues", [])
+        ]
+        LOGGER.info(
+            "Fetched %s issues from Jira for fixVersion %s",
+            len(issues),
+            fix_version,
+        )
+    except (
+        Exception
+    ) as error:  # noqa: BLE001 - we want to provide friendly fallback
         LOGGER.warning("Falling back to mock data due to API error: %s", error)
         issues = [
             {
@@ -78,6 +90,8 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
 
     timestamp = helpers.timestamp_for_filename(tz)
     snapshot_path = snapshot_dir / f"snapshot_{timestamp}.json"
-    helpers.write_json_safe({"fixVersion": fix_version, "issues": issues}, snapshot_path)
+    helpers.write_json_safe(
+        {"fixVersion": fix_version, "issues": issues}, snapshot_path
+    )
     LOGGER.info("Snapshot saved to %s", snapshot_path)
     return issues
