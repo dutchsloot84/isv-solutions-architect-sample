@@ -41,7 +41,7 @@ except ImportError:
             return self._session.get(url, **kwargs)
 
 
-from .helpers import load_config, resolve_path
+from .helpers import load_config, resolve_path, ssl_verify_path
 from .logger import get_logger
 
 
@@ -93,9 +93,10 @@ def _build_oauth_session(
     scope = config["jira"].get("api_scope")
     token_url = config["jira"].get("token_url")
 
+    secret = os.environ.get("JIRA_SECRET", "")
     extra = {
         "client_id": client_id,
-        "client_secret": os.environ.get("JIRA_CLIENT_SECRET", ""),
+        "client_secret": secret,
     }
 
     return OAuth2Session(
@@ -172,12 +173,13 @@ def authorize_jira() -> dict:
         )
 
     LOGGER.info("Authorization code received; exchanging for access token")
+    verify_target = ssl_verify_path()
     token = session.fetch_token(
         token_url=config["jira"].get("token_url"),
         code=OAuthCallbackHandler.auth_code,
-        client_secret=os.environ.get("JIRA_CLIENT_SECRET"),
+        client_secret=os.environ.get("JIRA_SECRET"),
         include_client_id=True,
-        verify=os.getenv("REQUESTS_CA_BUNDLE"),
+        verify=str(verify_target) if verify_target else True,
     )
 
     save_token(token, config)
@@ -197,25 +199,25 @@ def get_jira_session() -> OAuth2Session:
     session = _build_oauth_session(config, token=token)
 
     # Ensure token refresh using corporate certificate
-    verify_path = os.getenv("REQUESTS_CA_BUNDLE")
+    verify_path = ssl_verify_path()
     if not verify_path:
         LOGGER.warning(
-            "REQUESTS_CA_BUNDLE is not set; SSL verification may fail."
+            "SSL_CERT_PATH is not set; HTTPS requests may fail certificate validation."
         )
 
     def _token_updater(new_token: dict) -> None:
         save_token(new_token, config)
 
     session.token_updater = _token_updater
-    session.verify = verify_path
+    session.verify = str(verify_path) if verify_path else True
 
     # Attempt to refresh token if required
     if session.token and session.token.get("expires_in", 0) <= 0:
         session.refresh_token(
             config["jira"].get("token_url"),
             client_id=os.environ.get("JIRA_CLIENT_ID"),
-            client_secret=os.environ.get("JIRA_CLIENT_SECRET"),
-            verify=verify_path,
+            client_secret=os.environ.get("JIRA_SECRET"),
+            verify=str(verify_path) if verify_path else True,
         )
 
     return session

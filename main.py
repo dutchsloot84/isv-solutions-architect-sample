@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 
 from modules import compare, snapshot, summarize
@@ -16,10 +17,11 @@ def run(fix_version: str, force_update: bool = False) -> None:
     tz = config.get("reporting", {}).get("timezone")
     logger = get_logger(__name__)
 
-    snapshot_dir = Path(__file__).resolve().parent / config["paths"].get(
-        "snapshot_dir", "data/snapshots"
-    )
-    helpers.ensure_directory(snapshot_dir)
+    snapshot_dir_setting = config["paths"].get("snapshot_dir", "snapshots")
+    snapshot_dir_path = Path(snapshot_dir_setting)
+    if not snapshot_dir_path.is_absolute():
+        snapshot_dir_path = helpers.artifact_path(snapshot_dir_setting)
+    snapshot_dir = helpers.ensure_directory(snapshot_dir_path)
 
     current_date = helpers.current_timestamp(tz).strftime("%Y%m%d")
     latest_files = helpers.latest_snapshot_files(snapshot_dir, limit=1)
@@ -67,11 +69,14 @@ def run(fix_version: str, force_update: bool = False) -> None:
         "still_open": counts.get("still_open", 0),
         "notes": report_path.name,
     }
-    logs_dir = Path(__file__).resolve().parent / config["paths"].get(
-        "logs_dir", "data/logs"
-    )
-    helpers.append_csv_row(logs_dir / "run_log.csv", run_metadata)
-    logger.info("Run metadata appended to %s", logs_dir / "run_log.csv")
+    logs_dir_setting = config["paths"].get("logs_dir", "logs")
+    logs_dir_path = Path(logs_dir_setting)
+    if not logs_dir_path.is_absolute():
+        logs_dir_path = helpers.artifact_path(logs_dir_setting)
+    logs_dir = helpers.ensure_directory(logs_dir_path)
+    run_log_path = logs_dir / "run_log.csv"
+    helpers.append_csv_row(run_log_path, run_metadata)
+    logger.info("Run metadata appended to %s", run_log_path)
 
 
 def parse_args() -> argparse.Namespace:
@@ -79,7 +84,7 @@ def parse_args() -> argparse.Namespace:
         description="Generate Jira release readiness snapshots"
     )
     parser.add_argument(
-        "--fixVersion", required=True, help="Fix version to evaluate"
+        "--fixVersion", help="Fix version to evaluate. Overrides FIX_VERSION env if provided.",
     )
     parser.add_argument(
         "--update", action="store_true", help="Force snapshot refresh"
@@ -89,4 +94,9 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == "__main__":
     args = parse_args()
-    run(args.fixVersion, force_update=args.update)
+    fix_version = args.fixVersion or os.getenv("FIX_VERSION")
+    if not fix_version:
+        raise SystemExit(
+            "A fix version is required. Provide --fixVersion or set the FIX_VERSION environment variable."
+        )
+    run(fix_version, force_update=args.update)

@@ -4,7 +4,7 @@ The Release Snapshot Manager automates release readiness reporting for Jira Clou
 
 ## Features
 
-- OAuth 2.0 (3-legged) authentication against Jira Cloud using the corporate certificate defined by `REQUESTS_CA_BUNDLE`.
+- OAuth 2.0 (3-legged) authentication against Jira Cloud using the corporate certificate defined by `SSL_CERT_PATH`.
 - Snapshot storage for Jira issues retrieved via JQL.
 - Delta detection for new, completed, moved, and updated issues using `deepdiff`.
 - Markdown readiness report generation driven by Jinja2 templates.
@@ -14,17 +14,18 @@ The Release Snapshot Manager automates release readiness reporting for Jira Clou
 
 - Python 3.11+
 - Atlassian Jira Cloud tenant with OAuth 2.0 integration configured
-- Corporate SSL certificate stored as a PEM file and referenced via `REQUESTS_CA_BUNDLE`
+- Corporate SSL certificate stored as a PEM file and referenced via `SSL_CERT_PATH`
 
 ### Required Environment Variables
 
 ```
 JIRA_CLIENT_ID
-JIRA_CLIENT_SECRET
-REQUESTS_CA_BUNDLE
+JIRA_SECRET
+SSL_CERT_PATH
+ARTIFACT_ROOT
 ```
 
-Optional overrides for other Jira endpoints and paths may be provided via environment variables that match the structure of `configs/config.yaml` (for example `JIRA_BASE_URL`, `JIRA_AUTH_URL`, etc.).
+Set `FIX_VERSION` to supply a default fix version when the CLI flag is omitted. Optional overrides for Jira endpoints and path locations may be provided via environment variables that match the structure of `configs/config.yaml` (for example `JIRA_BASE_URL`, `JIRA_AUTH_URL`, etc.). Place secrets in a `.env` file for local development—variables are loaded automatically when present.
 
 ## Installation
 
@@ -42,7 +43,7 @@ Run the authorization flow locally. This launches a browser window where you can
 python -m modules.utils.oauth authorize
 ```
 
-This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `~/.jira_token.json`).
+This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `~/.jira_token.json`). SSL verification honors `SSL_CERT_PATH`, and tokens are masked in logs.
 
 ## Usage
 
@@ -52,14 +53,14 @@ Generate or update a release snapshot and readiness report for a fix version.
 python main.py --fixVersion "Mobilitas 2025.11.14"
 ```
 
-Use the `--update` flag to refresh the snapshot even if one exists for today.
+Use the `--update` flag to refresh the snapshot even if one exists for today. When the `--fixVersion` flag is omitted, the application falls back to the `FIX_VERSION` environment variable.
 
 ### Output
 
-- Snapshots are saved under `data/snapshots/snapshot_<timestamp>.json`.
-- Delta comparisons are written to `data/snapshots/delta_<timestamp>.json`.
-- Markdown readiness reports are generated in `reports/readiness_report_<date>.md`.
-- Run metadata is appended to `data/logs/run_log.csv`.
+- Snapshots are saved under `${ARTIFACT_ROOT}/snapshots/snapshot_<timestamp>.json`.
+- Delta comparisons are written to `${ARTIFACT_ROOT}/snapshots/delta_<timestamp>.json`.
+- Markdown readiness reports are generated in `${ARTIFACT_ROOT}/reports/readiness_report_<date>.md`.
+- Run metadata is appended to `${ARTIFACT_ROOT}/logs/run_log.csv`.
 
 ## Future Extensions
 
@@ -70,7 +71,7 @@ Use the `--update` flag to refresh the snapshot even if one exists for today.
 
 - Follow PEP 8 style guidelines.
 - Never log secrets or raw access tokens.
-- All outbound HTTPS requests must verify certificates using `REQUESTS_CA_BUNDLE`.
+- All outbound HTTPS requests must verify certificates using `SSL_CERT_PATH` (automatically exported to `REQUESTS_CA_BUNDLE`).
 
 ## Continuous Integration
 
