@@ -1,0 +1,15 @@
+project_owner: "dutchsloot84"
+project_number: 5
+default_labels:
+  - phase:build
+  - codex:scaffold
+  - status:ready
+
+schema:
+  required_fields:
+    - project_owner
+    - project_number
+  optional_fields:
+    - default_labels
+notes: >
+  Used by scripts/add_to_project.py to add new slices to the Project #5 Kanban board via local GH CLI.

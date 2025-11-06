@@ -1,0 +1,19 @@
+id: "03"
+title: "Markdown Readiness Reporter"
+phase: build
+branch: slice/03-readiness-reporter
+depends_on: ["02"]
+description: >
+  Generate automated readiness reports summarizing release blockers and
+  configuration status in Markdown format.
+tasks:
+  - name: Aggregate readiness signals from analyzers
+    output: modules/readiness/reporter.py
+  - name: Render Markdown reports with templating
+    output: reports/slice_03/readiness_template.md
+artifacts:
+  - ${ARTIFACT_ROOT}/03/analysis/readiness_inputs_<timestamp>.json
+  - ${ARTIFACT_ROOT}/03/reports/readiness_summary_<timestamp>.md
+success_criteria:
+  - Reporter produces Markdown with prioritized remediation checklist and metadata.
+  - Unit coverage validates report generation against fixture snapshot data.
