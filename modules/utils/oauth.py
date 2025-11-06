@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Optional
@@ -206,21 +207,87 @@ def get_jira_session() -> OAuth2Session:
         )
 
     def _token_updater(new_token: dict) -> None:
+        LOGGER.info(
+            "OAuth token updated",
+            extra={"event": "token_refresh_write", "slice_id": "07"},
+        )
         save_token(new_token, config)
 
     session.token_updater = _token_updater
     session.verify = str(verify_path) if verify_path else True
 
     # Attempt to refresh token if required
-    if session.token and session.token.get("expires_in", 0) <= 0:
-        session.refresh_token(
-            config["jira"].get("token_url"),
-            client_id=os.environ.get("JIRA_CLIENT_ID"),
-            client_secret=os.environ.get("JIRA_SECRET"),
+    if _token_expired(session.token):
+        _refresh_token(
+            session,
+            config,
             verify=str(verify_path) if verify_path else True,
         )
 
     return session
+
+
+def _token_expired(token: Optional[dict], *, leeway: int = 60) -> bool:
+    """Determine whether the token is expired or close to expiring."""
+
+    if not token:
+        return True
+
+    expires_at = token.get("expires_at")
+    if expires_at is not None:
+        try:
+            return float(expires_at) <= time.time() + leeway
+        except (TypeError, ValueError):
+            return True
+
+    expires_in = token.get("expires_in")
+    if expires_in is not None:
+        try:
+            return float(expires_in) <= leeway
+        except (TypeError, ValueError):
+            return True
+
+    return False
+
+
+def _refresh_token(
+    session: OAuth2Session,
+    config: dict,
+    *,
+    verify: bool | str,
+) -> None:
+    """Refresh the OAuth token and persist the new credentials."""
+
+    LOGGER.info(
+        "Refreshing OAuth token due to expiry",
+        extra={"event": "token_refresh", "slice_id": "07"},
+    )
+    try:
+        refreshed = session.refresh_token(
+            config["jira"].get("token_url"),
+            client_id=os.environ.get("JIRA_CLIENT_ID"),
+            client_secret=os.environ.get("JIRA_SECRET"),
+            verify=verify,
+        )
+    except Exception as error:  # noqa: BLE001 - propagate friendly context
+        LOGGER.error(
+            "OAuth token refresh failed",
+            extra={
+                "event": "token_refresh_failure",
+                "error": type(error).__name__,
+                "slice_id": "07",
+            },
+        )
+        raise
+
+    if isinstance(refreshed, dict):
+        save_token(refreshed, config)
+        session.token = refreshed
+
+    LOGGER.info(
+        "OAuth token refresh completed",
+        extra={"event": "token_refresh_success", "slice_id": "07"},
+    )
 
 
 if __name__ == "__main__":
