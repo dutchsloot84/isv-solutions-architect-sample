@@ -71,3 +71,15 @@ Use the `--update` flag to refresh the snapshot even if one exists for today.
 - Follow PEP 8 style guidelines.
 - Never log secrets or raw access tokens.
 - All outbound HTTPS requests must verify certificates using `REQUESTS_CA_BUNDLE`.
+
+## Continuous Integration
+
+GitHub Actions run automated checks on pushes to `main` and all pull requests. The active
+workflows include:
+
+- **Python CI** – installs dependencies, runs Ruff linting, and executes the pytest suite.
+- **Label Sync** – keeps repository labels aligned with `.github/labels.yml`.
+- **Weekly Summary** – publishes Friday progress summaries under `reports/`.
+
+No additional PR title validation or pre-commit automation runs in CI, keeping the
+pipeline focused on essential quality and reporting tasks.
