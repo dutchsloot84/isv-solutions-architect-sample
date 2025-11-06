@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "phase": "build",
+    "version_range": "v0.1.0 → v0.3.0",
+    "purpose": "Govern Release Intelligence build-out with Analyze → Execute → Validate loops.",
+    "environment": [
+      "JIRA_CLIENT_ID",
+      "JIRA_SECRET",
+      "SSL_CERT_PATH",
+      "ARTIFACT_ROOT",
+      "FIX_VERSION"
+    ],
+    "artifact_conventions": "Store artifacts under ${ARTIFACT_ROOT}/<slice-id>/ with ISO 8601 timestamps.",
+    "branch_convention": "slice/<slice-id>-<short-description>",
+    "logging_rules": "Mask JIRA_SECRET and certificate-derived secrets in logs and artifacts."
+  },
+  "ae_loop": ["Analyze", "Execute", "Validate"],
+  "critic_check": {
+    "parity": "Ensure Markdown and JSON orchestration stay aligned.",
+    "artifacts": "Confirm artifacts reside beneath ${ARTIFACT_ROOT} with proper naming.",
+    "masking": "Verify secrets remain masked in logs and outputs."
+  },
+  "project_board": {
+    "number": 5,
+    "owner": "dutchsloot84",
+    "sync_fields": ["Slice ID", "Status", "Fix Version", "Branch"]
+  }
+}

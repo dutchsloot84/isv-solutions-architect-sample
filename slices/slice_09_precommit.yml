@@ -1,0 +1,18 @@
+id: 09
+title: Repo Guard & Pre-Commit Hooks
+phase: guard
+branch: slice/09-precommit
+depends_on: [08]
+description: >
+  Add ruff, black, mypy, and pytest hooks to enforce code quality and type safety.
+tasks:
+  - name: Generate .pre-commit-config.yaml
+    output: .pre-commit-config.yaml
+  - name: Integrate hooks into local repo
+    output: scripts/setup_precommit.sh
+artifacts:
+  - .pre-commit-config.yaml
+  - ${ARTIFACT_ROOT}/logs/precommit_setup_<timestamp>.log
+success_criteria:
+  - Pre-commit hooks installed and active
+  - All checks pass on commit

@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "phase": "guard",
+    "version_range": "v0.3.0 → v0.4.0",
+    "purpose": "Hardening, reliability, and compliance improvements.",
+    "required_artifacts": [
+      "/schemas/jira_issue_schema.json",
+      "/reports/test_results_<date>.xml",
+      "/logs/security_audit_<timestamp>.log",
+      "/.pre-commit-config.yaml"
+    ],
+    "logging": {
+      "masking": "Mask all secrets, tokens, and PII before emitting outputs or storing logs.",
+      "audit": "Maintain structured audit logs with timestamps, slice identifiers, and validation results under ${ARTIFACT_ROOT}/logs/."
+    },
+    "success_criteria": [
+      "Test coverage ≥ 70%",
+      "Type coverage ≥ 95%",
+      "Zero secrets or PII present in logs"
+    ]
+  },
+  "ae_loop": ["Analyze", "Execute", "Validate", "Critic", "Secure"],
+  "environment": {
+    "variables": {
+      "ARTIFACT_ROOT": {
+        "required": true,
+        "notes": "Root directory for all Guard Phase artifacts."
+      },
+      "JIRA_CLIENT_ID": {"required": true},
+      "JIRA_SECRET": {"required": true, "masked": true},
+      "SSL_CERT_PATH": {"required": true},
+      "GH_TOKEN": {"required": true, "masked": true},
+      "ENABLE_CI_VALIDATION": {
+        "required": false,
+        "default": false,
+        "description": "Scaffolded toggle for enabling CI validation routines."
+      }
+    }
+  },
+  "tooling": {
+    "enabled": ["ruff", "black", "mypy", "pre-commit", "bandit", "log_sanitizer"],
+    "scaffolded": ["trufflehog", "pip-audit", "ENABLE_CI_VALIDATION"]
+  },
+  "optional_checks": {
+    "pre_commit_hooks": "enabled",
+    "linting": ["ruff", "black"],
+    "typing": "mypy",
+    "security": {
+      "bandit": "enabled",
+      "trufflehog": "disabled",
+      "pip_audit": "disabled"
+    },
+    "logs": { "sanitizer": "enabled" },
+    "ci_validation": "disabled"
+  },
+  "critic_check": {
+    "coverage": "Review pytest + coverage results to confirm ≥70% coverage.",
+    "typing": "Ensure mypy passes with ≥95% type coverage.",
+    "formatting": "Confirm ruff and black report no issues and pre-commit hooks succeed."
+  },
+  "security_audit": {
+    "requirements": [
+      "Verify log sanitizer stripped secrets before artifact storage.",
+      "Ensure security audit report exists at ${ARTIFACT_ROOT}/logs/security_audit_<timestamp>.log.",
+      "Document findings in structured audit trail with masked tokens."
+    ]
+  }
+}

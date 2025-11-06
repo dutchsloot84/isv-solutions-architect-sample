@@ -1,0 +1,7 @@
+{
+  "active_phase": "guard",
+  "active_mop": "MOP_guard_phase.json",
+  "version_range": "v0.3.0 - v0.4.0",
+  "last_phase": "build",
+  "archived_mop": "archive/prompts/MOP_build_phase_20251106T205059Z.json"
+}

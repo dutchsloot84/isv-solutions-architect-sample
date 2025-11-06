@@ -10,3 +10,6 @@ data/snapshots/*
 !data/snapshots/.gitkeep
 reports/*.md
 logs/*
+# Allow orchestration JSON prompts
+!prompts/*.json
+!archive/prompts/*.json
