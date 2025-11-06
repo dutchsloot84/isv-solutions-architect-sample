@@ -1,0 +1,19 @@
+id: "05"
+title: "CLI Orchestrator and Version Tagger"
+phase: build
+branch: slice/05-cli-orchestrator
+depends_on: ["04"]
+description: >
+  Deliver a command-line orchestrator that coordinates analyzers, reporting, and
+  release tagging workflows for the build phase.
+tasks:
+  - name: Assemble orchestration commands and workflow runner
+    output: modules/orchestrator/cli.py
+  - name: Integrate semantic version tagging helper
+    output: modules/orchestrator/versioning.py
+artifacts:
+  - ${ARTIFACT_ROOT}/05/cli/orchestrator_usage_<timestamp>.md
+  - ${ARTIFACT_ROOT}/05/releases/version_tag_notes_<timestamp>.md
+success_criteria:
+  - CLI orchestrator executes configured build-phase slices end-to-end with logging.
+  - Version tagging helper records release metadata and guardrails in documentation.

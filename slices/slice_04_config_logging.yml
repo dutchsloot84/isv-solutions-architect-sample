@@ -1,0 +1,19 @@
+id: "04"
+title: "Config and Logging Framework"
+phase: build
+branch: slice/04-config-logging
+depends_on: ["03"]
+description: >
+  Establish centralized configuration loading and structured logging utilities
+  shared across analyzers and reporters.
+tasks:
+  - name: Build configuration loader with validation
+    output: modules/config/loader.py
+  - name: Implement structured logging helpers
+    output: modules/logging/factory.py
+artifacts:
+  - ${ARTIFACT_ROOT}/04/design/config_logging_design_<timestamp>.md
+  - ${ARTIFACT_ROOT}/04/reports/logging_validation_<timestamp>.md
+success_criteria:
+  - Loader reads dotenv, environment, and defaults with schema validation.
+  - Logging helpers emit JSON-formatted events with consistent context metadata.

@@ -1,0 +1,19 @@
+id: "02"
+title: "Snapshot Delta Analyzer"
+phase: build
+branch: slice/02-snapshot-delta
+depends_on: ["01"]
+description: >
+  Introduce tooling to compare successive OAuth snapshot exports and highlight
+  configuration drift across releases.
+tasks:
+  - name: Implement delta analyzer library
+    output: modules/snapshot_delta/analyzer.py
+  - name: Provide CLI wrapper and sample report
+    output: reports/slice_02/delta_report_example.md
+artifacts:
+  - ${ARTIFACT_ROOT}/02/analysis/delta_requirements_<timestamp>.md
+  - ${ARTIFACT_ROOT}/02/reports/delta_summary_<timestamp>.md
+success_criteria:
+  - Analyzer computes field-level differences between snapshot files with masked secrets.
+  - Documentation describes usage within release workflows and includes sample report.
