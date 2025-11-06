@@ -1,0 +1,26 @@
+{
+  "jira":
+    {
+      "base_url": "https://jira.yourcompany.com",
+      "auth_url": "https://auth.atlassian.com/authorize",
+      "token_url": "https://auth.atlassian.com/oauth/token",
+      "api_scope": "read:jira-work write:jira-work offline_access",
+      "token_path": "~/.jira_token.json",
+      "redirect_uri": "http://localhost:8080/callback",
+      "jql_fields":
+        ["key", "summary", "status", "fixVersions", "customfield_12345"],
+    },
+  "project":
+    {
+      "done_statuses": ["Done", "Released", "Ready for Prod"],
+      "deployment_notes_field": "customfield_12345",
+    },
+  "paths":
+    {
+      "snapshot_dir": "data/snapshots",
+      "logs_dir": "data/logs",
+      "reports_dir": "reports",
+      "prompts_dir": "prompts",
+    },
+  "reporting": { "timezone": "UTC", "report_template": "default" },
+}
