@@ -110,3 +110,49 @@ def test_generate_readiness_report_persists_artifacts(tmp_path: Path, sample_del
 
     # Clean up environment override
     del os.environ["ARTIFACT_ROOT"]
+
+def test_aggregate_readiness_merges_duplicate_entries() -> None:
+    delta = {
+        "details": {
+            "added": [
+                {
+                    "key": "ABC-10",
+                    "summary": "Introduce observability",
+                    "status": "In Progress",
+                }
+            ],
+            "changed": [
+                {
+                    "key": "ABC-20",
+                    "summary": None,
+                    "changes": {
+                        "status": {"previous": "In Progress", "current": "Blocked"},
+                        "deployment_notes": {"previous": "", "current": "Waiting"},
+                    },
+                }
+            ],
+            "unchanged": [
+                {
+                    "key": "ABC-20",
+                    "summary": "Add rate limits",
+                    "status": "Blocked",
+                }
+            ],
+        },
+        "summary": {"total_current": 2},
+    }
+
+    aggregated = reporter.aggregate_readiness(
+        delta,
+        config={
+            "project": {"done_statuses": ["Done", "Ready for Prod"]},
+            "reporting": {"timezone": "UTC"},
+        },
+    )
+
+    checklist = aggregated["checklist"]
+    assert checklist[0]["category"] == "New Issue"
+    assert checklist[1]["category"] == "Changed Issue"
+    assert "status: In Progress ➜ Blocked" in checklist[1]["notes"]
+    assert checklist[1]["summary"] == "Add rate limits"
+    assert aggregated["readiness"]["open_items"] == 2
