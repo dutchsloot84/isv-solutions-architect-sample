@@ -101,3 +101,15 @@ def test_release_notes_mask_secrets(monkeypatch, tmp_path):
     assert "super-secret" not in notes
     assert "***" in notes
     assert plan.notes_path.name == "version_tag_notes_20240101T010101Z.md"
+
+def test_analyze_requires_core_environment(tmp_path, monkeypatch):
+    monkeypatch.setenv("ARTIFACT_ROOT", str(tmp_path / "artifacts"))
+    env = {"ARTIFACT_ROOT": str(tmp_path / "artifacts")}
+    orchestrator = Orchestrator(env=env, fix_version="2.0.0")
+
+    with pytest.raises(EnvironmentError) as exc_info:
+        orchestrator.analyze()
+
+    message = str(exc_info.value)
+    assert "JIRA_CLIENT_ID" in message
+    assert "JIRA_SECRET" in message
