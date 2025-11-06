@@ -8,27 +8,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-try:
-    from dotenv import load_dotenv
-except ImportError:  # pragma: no cover - optional dependency fallback
-    load_dotenv = None  # type: ignore[assignment]
-
-try:
-    import yaml
-except ImportError:
-    import json as _json
-
-    class _SimpleYAML:  # type: ignore[misc]
-        """Minimal YAML parser fallback that supports JSON-formatted content."""
-
-        @staticmethod
-        def safe_load(stream):  # type: ignore[override]
-            if hasattr(stream, "read"):
-                return _json.loads(stream.read())
-            return _json.loads(stream)
-
-    yaml = _SimpleYAML()
-
 
 def project_root() -> Path:
     """Return the root directory for the release snapshot manager project."""
@@ -43,21 +22,6 @@ def module_root() -> Path:
 def config_path() -> Path:
     """Return the default configuration file path."""
     return project_root() / "configs" / "config.yaml"
-
-
-def load_environment(dotenv_path: Optional[Path | str] = None) -> None:
-    """Load environment variables from a .env file when available."""
-
-    if load_dotenv is None:
-        return
-
-    resolved = (
-        Path(dotenv_path).expanduser()
-        if dotenv_path
-        else project_root() / ".env"
-    )
-    if resolved.exists():
-        load_dotenv(dotenv_path=resolved)  # type: ignore[arg-type]
 
 
 def artifact_root() -> Path:
@@ -91,42 +55,11 @@ def ssl_verify_path() -> Optional[Path]:
 
 
 def load_config(override_path: Optional[Path | str] = None) -> Dict[str, Any]:
-    """Load YAML configuration and override with environment variables when present."""
-    load_environment()
-    config_file = Path(override_path) if override_path else config_path()
-    if not config_file.exists():
-        raise FileNotFoundError(
-            f"Configuration file not found at {config_file}"
-        )
+    """Load configuration using the centralized loader module."""
 
-    with config_file.open("r", encoding="utf-8") as stream:
-        config = yaml.safe_load(stream) or {}
+    from modules.config.loader import load_config as _load_config
 
-    overrides = {
-        "jira": {
-            "base_url": os.getenv("JIRA_BASE_URL"),
-            "auth_url": os.getenv("JIRA_AUTH_URL"),
-            "token_url": os.getenv("JIRA_TOKEN_URL"),
-            "api_scope": os.getenv("JIRA_API_SCOPE"),
-            "token_path": os.getenv("JIRA_TOKEN_PATH"),
-            "redirect_uri": os.getenv("JIRA_REDIRECT_URI"),
-        },
-        "paths": {
-            "snapshot_dir": os.getenv("SNAPSHOT_DIR"),
-            "logs_dir": os.getenv("LOGS_DIR"),
-            "reports_dir": os.getenv("REPORTS_DIR"),
-            "prompts_dir": os.getenv("PROMPTS_DIR"),
-        },
-    }
-
-    for section, values in overrides.items():
-        if section not in config:
-            config[section] = {}
-        for key, value in values.items():
-            if value:
-                config[section][key] = value
-
-    return config
+    return _load_config(override_path)
 
 
 def ensure_directory(path: Path | str) -> Path:
