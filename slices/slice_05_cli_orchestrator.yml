@@ -4,8 +4,8 @@ phase: build
 branch: slice/05-cli-orchestrator
 depends_on: ["04"]
 description: >
-  Deliver a command-line orchestrator that coordinates analyzers, reporting, and
-  release tagging workflows for the build phase.
+  Deliver a command-line orchestrator coordinating analyzers, reporting,
+  and release tagging workflows with structured logging and env awareness.
 tasks:
   - name: Assemble orchestration commands and workflow runner
     output: modules/orchestrator/cli.py
@@ -14,6 +14,8 @@ tasks:
 artifacts:
   - ${ARTIFACT_ROOT}/05/cli/orchestrator_usage_<timestamp>.md
   - ${ARTIFACT_ROOT}/05/releases/version_tag_notes_<timestamp>.md
+  - ${ARTIFACT_ROOT}/progress/05_<timestamp>.json
 success_criteria:
-  - CLI orchestrator executes configured build-phase slices end-to-end with logging.
-  - Version tagging helper records release metadata and guardrails in documentation.
+  - CLI orchestrator runs build-phase analyzers end-to-end with structured logs.
+  - Version tagging helper records release metadata while masking secrets.
+  - Progress artifacts and documentation align with MOP Build Phase requirements.
