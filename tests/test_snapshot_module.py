@@ -136,7 +136,9 @@ def test_fetch_jql_results_uses_mock_data_on_failure(
 
 
 def test_capture_snapshot_csv_fallback(
-    snapshot_environment: dict[str, str], monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    snapshot_environment: dict[str, str],
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
 ) -> None:
     csv_path = tmp_path / "export.csv"
     csv_path.write_text(

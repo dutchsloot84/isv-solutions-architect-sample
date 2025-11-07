@@ -10,6 +10,7 @@ from typing import Optional
 from modules import compare, snapshot, summarize
 from modules.utils import helpers
 from modules.utils.logger import get_logger
+
 CSV_DEFAULT_PATH = "artifacts/imports/jira_export.csv"
 
 
@@ -59,18 +60,16 @@ def _prompt_for_csv(logger) -> Path:
     target_path = helpers.project_root() / CSV_DEFAULT_PATH
     helpers.ensure_directory(target_path.parent)
     logger.info(
-        "Prompting operator to provide fallback CSV at %s", target_path,
+        "Prompting operator to provide fallback CSV at %s",
+        target_path,
         extra={"mode": "csv_fallback"},
     )
     print(
         "\n⚠️ OAuth unavailable — entering CSV fallback mode."
         "\nPlease export your Jira issues as CSV from your desired JQL view (e.g.,"
-        " project=MOB AND fixVersion=\"Mobilitas 2025.11.14\")."
+        ' project=MOB AND fixVersion="Mobilitas 2025.11.14").'
     )
-    print(
-        "Then place the file at"
-        f" {target_path} and press Enter to continue..."
-    )
+    print("Then place the file at" f" {target_path} and press Enter to continue...")
     input()
     return target_path
 
