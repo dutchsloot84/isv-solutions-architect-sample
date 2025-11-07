@@ -57,7 +57,13 @@ else:
 
 import requests
 
-from .helpers import ensure_directory, load_config, project_root, resolve_path, ssl_verify_path
+from .helpers import (
+    ensure_directory,
+    load_config,
+    project_root,
+    resolve_path,
+    ssl_verify_path,
+)
 from .logger import get_logger
 
 LOGGER = get_logger(__name__)
@@ -119,7 +125,9 @@ def _mask_sensitive(value: str | None) -> str | None:
 class OAuthDiagnosticRecorder:
     """Persist structured OAuth diagnostics for the current authorization run."""
 
-    def __init__(self, scopes: Sequence[str], logs_dir: Path | str | None = None) -> None:
+    def __init__(
+        self, scopes: Sequence[str], logs_dir: Path | str | None = None
+    ) -> None:
         self._entries: list[dict[str, object]] = []
         base_dir = ensure_directory(logs_dir or Path("logs"))
         self._scopes = list(scopes)
@@ -137,7 +145,9 @@ class OAuthDiagnosticRecorder:
     ) -> None:
         entry = {
             "timestamp": _phoenix_now().isoformat(),
-            "scopes": _scopes_to_string(list(scopes) if scopes is not None else self._scopes),
+            "scopes": _scopes_to_string(
+                list(scopes) if scopes is not None else self._scopes
+            ),
             "status_code": status_code,
             "error": _mask_sensitive(error),
             "response": _mask_sensitive(response),
@@ -208,7 +218,9 @@ def _build_oauth_session(
         raise RuntimeError("Environment variable JIRA_CLIENT_ID is required")
 
     redirect_uri = config["jira"].get("redirect_uri")
-    resolved_scopes = _scopes_to_oauthlib(scopes if scopes is not None else _resolve_requested_scopes(config))
+    resolved_scopes = _scopes_to_oauthlib(
+        scopes if scopes is not None else _resolve_requested_scopes(config)
+    )
     token_url = config["jira"].get("token_url")
 
     secret = os.environ.get("JIRA_SECRET", "")
@@ -389,9 +401,7 @@ def authorize_jira() -> dict:
 
     logs_dir_setting = config.get("paths", {}).get("logs_dir")
     logs_dir_path = (
-        resolve_path(logs_dir_setting)
-        if logs_dir_setting
-        else project_root() / "logs"
+        resolve_path(logs_dir_setting) if logs_dir_setting else project_root() / "logs"
     )
     diagnostic_recorder = OAuthDiagnosticRecorder(current_scopes, logs_dir_path)
 
@@ -537,7 +547,9 @@ def authorize_jira() -> dict:
                     },
                 )
             break
-        except Exception as error:  # noqa: BLE001 - propagate context for troubleshooting
+        except (
+            Exception
+        ) as error:  # noqa: BLE001 - propagate context for troubleshooting
             response = getattr(error, "response", None)
             status_code = getattr(response, "status_code", None)
             status_code_value = status_code if isinstance(status_code, int) else None
@@ -576,7 +588,9 @@ def authorize_jira() -> dict:
                 ]
                 if not fallback_scopes:
                     fallback_scopes = [
-                        scope for scope in requested_scopes if scope.lower() != offline_scope
+                        scope
+                        for scope in requested_scopes
+                        if scope.lower() != offline_scope
                     ]
                 current_scopes = fallback_scopes
                 using_fallback_scopes = True
