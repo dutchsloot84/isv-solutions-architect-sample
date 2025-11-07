@@ -80,7 +80,9 @@ def test_sanitize_logs_raises_for_missing_file(tmp_path):
 
 
 def test_mask_sensitive_handles_sets_and_tuples():
-    masked = mask_sensitive({"values": {"secret"}, "more": ("secret",)}, secrets=["secret"])
+    masked = mask_sensitive(
+        {"values": {"secret"}, "more": ("secret",)}, secrets=["secret"]
+    )
     assert masked["values"] == {"***"}
     assert masked["more"] == ("***",)
 

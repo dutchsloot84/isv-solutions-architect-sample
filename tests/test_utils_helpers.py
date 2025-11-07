@@ -117,7 +117,11 @@ def test_load_config_delegates(monkeypatch):
         captured["path"] = path
         return {"loaded": True}
 
-    monkeypatch.setitem(sys.modules, "modules.config.loader", type("Loader", (), {"load_config": staticmethod(fake_loader)}))
+    monkeypatch.setitem(
+        sys.modules,
+        "modules.config.loader",
+        type("Loader", (), {"load_config": staticmethod(fake_loader)}),
+    )
 
     result = helpers.load_config(Path("override.yaml"))
 

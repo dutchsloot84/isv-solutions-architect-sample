@@ -56,7 +56,9 @@ def test_run_pytest_with_coverage_invokes_pytest(tmp_path, monkeypatch):
         sanitized.append(list(paths if isinstance(paths, (list, tuple)) else [paths]))
 
     monkeypatch.setattr(run_tests, "pytest", SimpleNamespace(main=fake_pytest_main))
-    monkeypatch.setattr(run_tests, "_write_coverage_summary", fake_write_coverage_summary)
+    monkeypatch.setattr(
+        run_tests, "_write_coverage_summary", fake_write_coverage_summary
+    )
     monkeypatch.setattr(run_tests, "sanitize_logs", fake_sanitize_logs)
 
     exit_code = run_tests.run_pytest_with_coverage()

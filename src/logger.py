@@ -93,7 +93,9 @@ class _Sanitizer:
     def _mask_string(self, value: str) -> str:
         masked = value
         for pattern in self.patterns:
-            masked = pattern.sub(lambda match: match.group(1) + self.placeholder, masked)
+            masked = pattern.sub(
+                lambda match: match.group(1) + self.placeholder, masked
+            )
         for secret in self.secrets:
             masked = masked.replace(secret, self.placeholder)
         return masked
@@ -137,7 +139,9 @@ def sanitize_logs(
         if not resolved.exists():
             raise FileNotFoundError(f"Log file not found: {resolved}")
         if resolved.is_dir():
-            raise IsADirectoryError(f"Expected a file but received directory: {resolved}")
+            raise IsADirectoryError(
+                f"Expected a file but received directory: {resolved}"
+            )
         content = resolved.read_text(encoding=encoding)
         masked = sanitizer.mask(content)
         if masked != content:
@@ -151,4 +155,3 @@ __all__ = [
     "mask_sensitive",
     "sanitize_logs",
 ]
-
