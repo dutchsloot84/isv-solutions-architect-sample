@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -37,6 +39,7 @@ class DummyOAuthSession:
             "refresh_token": "refresh-123",
             "token_type": "Bearer",
             "expires_in": 3600,
+            "expires_at": time.time() + 3600,
         }
 
 
@@ -60,6 +63,15 @@ def test_token_exchange_success(
     monkeypatch.setenv("JIRA_CLIENT_ID", "abcd1234client")
     monkeypatch.setenv("JIRA_SECRET", "supersecret")
     monkeypatch.setenv("OAUTH_BROWSER_OPEN", "0")
+
+    info_messages: list[str] = []
+    original_info = oauth_utils.LOGGER.info
+
+    def info_spy(msg: str, *args: Any, **kwargs: Any) -> Any:
+        info_messages.append(str(msg))
+        return original_info(msg, *args, **kwargs)
+
+    monkeypatch.setattr(oauth_utils.LOGGER, "info", info_spy)
 
     monkeypatch.setattr(
         oauth_utils, "_build_oauth_session", lambda config: dummy_session
@@ -90,11 +102,7 @@ def test_token_exchange_success(
     oauth_utils.OAuthCallbackHandler.auth_code = "auth-code-123"
     oauth_utils.OAuthCallbackHandler.error = None
 
-    try:
-        token = oauth_utils.authorize_jira()
-    finally:
-        oauth_utils.OAuthCallbackHandler.auth_code = None
-        oauth_utils.OAuthCallbackHandler.error = None
+    token = oauth_utils.authorize_jira()
 
     assert token["access_token"] == "abc"
     assert token["refresh_token"] == "refresh-123"
@@ -106,6 +114,9 @@ def test_token_exchange_success(
     assert "redirect_uri" not in dummy_session.fetch_kwargs
     assert dummy_session.fetch_kwargs["verify"] is True
     assert dummy_session.fetch_attempts == 2
+
+    assert oauth_utils.OAuthCallbackHandler.auth_code is None
+    assert oauth_utils.OAuthCallbackHandler.error is None
 
     basic_auth = requests.auth.HTTPBasicAuth(*dummy_session.fetch_kwargs["auth"])
     request = requests.Request("POST", "https://example.com")
@@ -175,3 +186,98 @@ def test_complete_authorization_uses_basic_auth(
     prepared = request.prepare()
     basic_auth(prepared)
     assert prepared.headers["Authorization"].startswith("Basic ")
+
+
+def test_authorize_jira_persists_token_and_logs_success(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    dummy_session = DummyOAuthSession()
+    token_path = tmp_path / ".secrets" / "jira_token.json"
+
+    monkeypatch.setenv("JIRA_CLIENT_ID", "abcd1234client")
+    monkeypatch.setenv("JIRA_SECRET", "supersecret")
+    monkeypatch.setenv("OAUTH_BROWSER_OPEN", "0")
+
+    info_messages: list[str] = []
+    original_info = oauth_utils.LOGGER.info
+
+    def info_spy(msg: str, *args: Any, **kwargs: Any) -> Any:
+        info_messages.append(str(msg))
+        return original_info(msg, *args, **kwargs)
+
+    monkeypatch.setattr(oauth_utils.LOGGER, "info", info_spy)
+
+    monkeypatch.setattr(
+        oauth_utils, "_build_oauth_session", lambda config: dummy_session
+    )
+    monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
+    monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
+    monkeypatch.setattr(oauth_utils.webbrowser, "open", lambda *_: True)
+    monkeypatch.setattr(
+        oauth_utils,
+        "load_config",
+        lambda: {
+            "jira": {
+                "auth_url": "https://example.com/authorize",
+                "token_url": "https://example.com/token",
+                "redirect_uri": "http://localhost:8000/callback",
+                "token_path": str(token_path),
+                "api_scope": "read:me",
+            }
+        },
+    )
+
+    oauth_utils.OAuthCallbackHandler.auth_code = "auth-code-123"
+    oauth_utils.OAuthCallbackHandler.error = None
+
+    oauth_utils.authorize_jira()
+
+    assert token_path.exists()
+    data = json.loads(token_path.read_text(encoding="utf-8"))
+    assert data["access_token"] == "abc"
+    assert "refresh_token" in data
+    assert any(
+        "✅ Access token successfully retrieved" in message for message in info_messages
+    )
+
+
+def test_authorize_jira_skips_when_token_valid(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    token_path = tmp_path / ".secrets" / "jira_token.json"
+    token_path.parent.mkdir(parents=True, exist_ok=True)
+    token_payload = {
+        "access_token": "existing",
+        "refresh_token": "refresh",
+        "expires_at": time.time() + 3600,
+    }
+    token_path.write_text(json.dumps(token_payload), encoding="utf-8")
+
+    monkeypatch.setenv("OAUTH_BROWSER_OPEN", "0")
+
+    monkeypatch.setattr(
+        oauth_utils,
+        "load_config",
+        lambda: {
+            "jira": {
+                "auth_url": "https://example.com/authorize",
+                "token_url": "https://example.com/token",
+                "redirect_uri": "http://localhost:8000/callback",
+                "token_path": str(token_path),
+                "api_scope": "read:me",
+            }
+        },
+    )
+
+    def fail_build(_: dict) -> None:
+        raise AssertionError("Should not build OAuth session when token valid")
+
+    monkeypatch.setattr(oauth_utils, "_build_oauth_session", fail_build)
+
+    oauth_utils.OAuthCallbackHandler.auth_code = None
+    oauth_utils.OAuthCallbackHandler.error = None
+
+    result = oauth_utils.authorize_jira()
+
+    assert result == token_payload
