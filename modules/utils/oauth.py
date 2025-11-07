@@ -168,6 +168,17 @@ def authorize_jira() -> dict:
     )
 
     session = _build_oauth_session(config)
+    redirect_uri = config["jira"].get("redirect_uri")
+    LOGGER.info(
+        "Preparing Jira authorization request",
+        extra={
+            "event": "oauth_authorize_parameters",
+            "audience": audience,
+            "redirect_uri": redirect_uri,
+            "slice_id": "07",
+        },
+    )
+
     authorization_url, _ = session.authorization_url(
         auth_url,
         audience=audience,
@@ -175,7 +186,6 @@ def authorize_jira() -> dict:
     )
 
     LOGGER.info("Starting local HTTP server to capture Jira OAuth callback")
-    redirect_uri = config["jira"].get("redirect_uri")
     parsed = urlparse(redirect_uri)
     server_address = (parsed.hostname or "localhost", int(parsed.port or 8080))
     httpd = HTTPServer(server_address, OAuthCallbackHandler)
@@ -243,41 +253,92 @@ def authorize_jira() -> dict:
 
     LOGGER.info("Authorization code received; exchanging for access token")
     verify_target = ssl_verify_path()
-    try:
-        token = session.fetch_token(
-            token_url=config["jira"].get("token_url"),
-            code=OAuthCallbackHandler.auth_code,
-            client_secret=os.environ.get("JIRA_SECRET"),
-            include_client_id=True,
-            verify=str(verify_target) if verify_target else True,
-        )
-    except Exception as error:  # noqa: BLE001 - propagate context for troubleshooting
-        response = getattr(error, "response", None)
-        if response is not None:
-            body = None
-            try:
-                body = response.text
-            except Exception:  # noqa: BLE001 - best-effort logging
-                body = "<unable to read body>"
-            LOGGER.error(
-                "OAuth token exchange failed",
-                extra={
-                    "event": "oauth_token_exchange_failure",
-                    "status_code": response.status_code,
-                    "response_body": body,
-                    "slice_id": "07",
-                },
+    token_url = config["jira"].get("token_url")
+    client_id = os.environ.get("JIRA_CLIENT_ID")
+    client_secret = os.environ.get("JIRA_SECRET")
+    if not client_id:
+        raise RuntimeError("Environment variable JIRA_CLIENT_ID is required")
+
+    client_id_prefix = client_id[:4] if len(client_id) >= 4 else client_id[0]
+    LOGGER.info("Exchanging authorization code for token at %s", token_url)
+    LOGGER.debug("Using Basic Auth with client_id=%s***", client_id_prefix)
+
+    attempts = 0
+    max_attempts = 3
+    while True:
+        attempts += 1
+        try:
+            token = session.fetch_token(
+                token_url=token_url,
+                code=OAuthCallbackHandler.auth_code,
+                auth=(client_id, client_secret),
+                include_client_id=False,
+                redirect_uri=config["jira"].get("redirect_uri"),
+                verify=str(verify_target) if verify_target else True,
             )
-        else:
-            LOGGER.error(
-                "OAuth token exchange raised unexpected error",
-                extra={
-                    "event": "oauth_token_exchange_error",
-                    "error": type(error).__name__,
-                    "slice_id": "07",
-                },
+            if attempts > 1:
+                LOGGER.info(
+                    "Token exchange succeeded after %s attempts",
+                    attempts,
+                    extra={
+                        "event": "oauth_token_exchange_retry_success",
+                        "attempts": attempts,
+                        "slice_id": "07",
+                    },
+                )
+            break
+        except (
+            Exception
+        ) as error:  # noqa: BLE001 - propagate context for troubleshooting
+            response = getattr(error, "response", None)
+            status_code = getattr(response, "status_code", None)
+            should_retry = (
+                response is not None
+                and isinstance(status_code, int)
+                and 500 <= status_code < 600
+                and attempts < max_attempts
             )
-        raise
+            if should_retry:
+                LOGGER.warning(
+                    "Transient OAuth token exchange failure (status=%s); retrying %s/%s",
+                    status_code,
+                    attempts + 1,
+                    max_attempts,
+                    extra={
+                        "event": "oauth_token_exchange_retry",
+                        "status_code": status_code,
+                        "attempt": attempts,
+                        "slice_id": "07",
+                    },
+                )
+                time.sleep(min(2 ** (attempts - 1), 4))
+                continue
+
+            if response is not None:
+                body = None
+                try:
+                    body = response.text
+                except Exception:  # noqa: BLE001 - best-effort logging
+                    body = "<unable to read body>"
+                LOGGER.error(
+                    "OAuth token exchange failed",
+                    extra={
+                        "event": "oauth_token_exchange_failure",
+                        "status_code": response.status_code,
+                        "response_body": body,
+                        "slice_id": "07",
+                    },
+                )
+            else:
+                LOGGER.error(
+                    "OAuth token exchange raised unexpected error",
+                    extra={
+                        "event": "oauth_token_exchange_error",
+                        "error": type(error).__name__,
+                        "slice_id": "07",
+                    },
+                )
+            raise
 
     save_token(token, config)
     return token
@@ -294,6 +355,11 @@ def complete_authorization(auth_code: str) -> dict:
     client_secret = os.environ.get("JIRA_SECRET", "")
     token_url = config["jira"].get("token_url")
     redirect_uri = config["jira"].get("redirect_uri")
+    audience = (
+        os.environ.get("JIRA_AUDIENCE")
+        or config["jira"].get("audience")
+        or "api.atlassian.com"
+    )
 
     verify_target = ssl_verify_path()
     verify = str(verify_target) if verify_target else True
@@ -302,11 +368,11 @@ def complete_authorization(auth_code: str) -> dict:
         token_url,
         json={
             "grant_type": "authorization_code",
-            "client_id": client_id,
-            "client_secret": client_secret,
             "code": auth_code,
             "redirect_uri": redirect_uri,
+            "audience": audience,
         },
+        auth=(client_id, client_secret),
         verify=verify,
         timeout=30,
     )
