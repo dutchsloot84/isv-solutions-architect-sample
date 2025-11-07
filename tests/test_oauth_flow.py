@@ -14,10 +14,11 @@ from modules.utils import oauth as oauth_utils
 class DummyOAuthSession:
     """Capture parameters passed to the OAuth session during testing."""
 
-    def __init__(self, failures: Optional[List[int]] = None) -> None:
+    def __init__(self, failures: Optional[List[Any]] = None) -> None:
         self.fetch_kwargs: Dict[str, Any] | None = None
         self.fetch_attempts = 0
         self.failures = failures or []
+        self.fetch_history: List[Dict[str, Any]] = []
 
     def authorization_url(self, url: str, **kwargs: Any) -> tuple[str, str]:
         return url, "state-token"
@@ -25,11 +26,18 @@ class DummyOAuthSession:
     def fetch_token(self, *_, **kwargs: Any) -> Dict[str, Any]:
         self.fetch_attempts += 1
         self.fetch_kwargs = dict(kwargs)
+        self.fetch_history.append(dict(kwargs))
         if self.failures:
-            status = self.failures.pop(0)
+            failure = self.failures.pop(0)
+            if isinstance(failure, tuple):
+                status = failure[0]
+                body = failure[1] if len(failure) > 1 else "server error"
+            else:
+                status = failure
+                body = "server error"
             response = requests.Response()
             response.status_code = status
-            response._content = b"server error"  # type: ignore[attr-defined]
+            response._content = body.encode("utf-8")  # type: ignore[attr-defined]
             error = requests.HTTPError("server error")
             error.response = response  # type: ignore[assignment]
             raise error
@@ -74,7 +82,9 @@ def test_token_exchange_success(
     monkeypatch.setattr(oauth_utils.LOGGER, "info", info_spy)
 
     monkeypatch.setattr(
-        oauth_utils, "_build_oauth_session", lambda config: dummy_session
+        oauth_utils,
+        "_build_oauth_session",
+        lambda config, token=None, scopes=None: dummy_session,
     )
     monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
     monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
@@ -95,7 +105,8 @@ def test_token_exchange_success(
                 "redirect_uri": "http://localhost:8000/callback",
                 "token_path": str(tmp_path / "token.json"),
                 "api_scope": "read:me",
-            }
+            },
+            "paths": {"logs_dir": str(tmp_path / "logs")},
         },
     )
 
@@ -113,6 +124,7 @@ def test_token_exchange_success(
     assert dummy_session.fetch_kwargs["include_client_id"] is False
     assert "redirect_uri" not in dummy_session.fetch_kwargs
     assert dummy_session.fetch_kwargs["verify"] is True
+    assert dummy_session.fetch_kwargs["scope"] == ["read:me"]
     assert dummy_session.fetch_attempts == 2
 
     assert oauth_utils.OAuthCallbackHandler.auth_code is None
@@ -209,7 +221,9 @@ def test_authorize_jira_persists_token_and_logs_success(
     monkeypatch.setattr(oauth_utils.LOGGER, "info", info_spy)
 
     monkeypatch.setattr(
-        oauth_utils, "_build_oauth_session", lambda config: dummy_session
+        oauth_utils,
+        "_build_oauth_session",
+        lambda config, token=None, scopes=None: dummy_session,
     )
     monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
     monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
@@ -224,7 +238,8 @@ def test_authorize_jira_persists_token_and_logs_success(
                 "redirect_uri": "http://localhost:8000/callback",
                 "token_path": str(token_path),
                 "api_scope": "read:me",
-            }
+            },
+            "paths": {"logs_dir": str(tmp_path / "logs")},
         },
     )
 
@@ -240,6 +255,70 @@ def test_authorize_jira_persists_token_and_logs_success(
     assert any(
         "✅ Access token successfully retrieved" in message for message in info_messages
     )
+    diagnostics = sorted((tmp_path / "logs").glob("oauth_diagnostics_*.json"))
+    assert diagnostics, "Expected diagnostics log file to be created"
+    diagnostic_entries = json.loads(diagnostics[0].read_text(encoding="utf-8"))
+    assert diagnostic_entries[-1]["status_code"] == 200
+    assert diagnostic_entries[-1]["retry_fallback"] is False
+
+
+def test_authorize_jira_falls_back_when_offline_scope_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    dummy_session = DummyOAuthSession(failures=[(403, '{"error":"access_denied"}')])
+    token_path = tmp_path / ".secrets" / "jira_token.json"
+    logs_dir = tmp_path / "logs"
+
+    monkeypatch.setenv("JIRA_CLIENT_ID", "abcd1234client")
+    monkeypatch.setenv("JIRA_SECRET", "supersecret")
+    monkeypatch.setenv("OAUTH_BROWSER_OPEN", "0")
+    monkeypatch.setenv("JIRA_SCOPES", "read:me offline_access")
+
+    monkeypatch.setattr(
+        oauth_utils,
+        "_build_oauth_session",
+        lambda config, token=None, scopes=None: dummy_session,
+    )
+    monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
+    monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
+    monkeypatch.setattr(oauth_utils.webbrowser, "open", lambda *_: True)
+    monkeypatch.setattr(
+        oauth_utils,
+        "load_config",
+        lambda: {
+            "jira": {
+                "auth_url": "https://example.com/authorize",
+                "token_url": "https://example.com/token",
+                "redirect_uri": "http://localhost:8000/callback",
+                "token_path": str(token_path),
+                "api_scope": "read:me offline_access",
+            },
+            "paths": {"logs_dir": str(logs_dir)},
+        },
+    )
+
+    oauth_utils.OAuthCallbackHandler.auth_code = "auth-code-123"
+    oauth_utils.OAuthCallbackHandler.error = None
+
+    token = oauth_utils.authorize_jira()
+
+    assert token["access_token"] == "abc"
+    assert dummy_session.fetch_attempts == 2
+    assert "offline_access" in dummy_session.fetch_history[0]["scope"]
+    assert "offline_access" not in dummy_session.fetch_history[1]["scope"]
+
+    diagnostics = sorted(logs_dir.glob("oauth_diagnostics_*.json"))
+    assert diagnostics, "Expected diagnostics log file to capture fallback"
+    diagnostic_entries = json.loads(diagnostics[0].read_text(encoding="utf-8"))
+    assert diagnostic_entries[0]["status_code"] == 403
+    assert diagnostic_entries[0]["retry_fallback"] is True
+    assert diagnostic_entries[-1]["status_code"] == 200
+    assert diagnostic_entries[-1]["retry_fallback"] is True
+
+    saved_data = json.loads(token_path.read_text(encoding="utf-8"))
+    assert "_metadata" in saved_data
+    assert "saved_at" in saved_data["_metadata"]
 
 
 def test_authorize_jira_skips_when_token_valid(
@@ -266,11 +345,12 @@ def test_authorize_jira_skips_when_token_valid(
                 "redirect_uri": "http://localhost:8000/callback",
                 "token_path": str(token_path),
                 "api_scope": "read:me",
-            }
+            },
+            "paths": {"logs_dir": str(tmp_path / "logs")},
         },
     )
 
-    def fail_build(_: dict) -> None:
+    def fail_build(*_: Any, **__: Any) -> None:
         raise AssertionError("Should not build OAuth session when token valid")
 
     monkeypatch.setattr(oauth_utils, "_build_oauth_session", fail_build)

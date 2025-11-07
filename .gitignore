@@ -12,7 +12,9 @@ __pycache__/
 data/snapshots/*
 !data/snapshots/.gitkeep
 reports/*.md
+!reports/oauth_offline_access_painpoint_*.md
 logs/*
+!logs/oauth_diagnostics_*.json
 artifacts/*
 !artifacts/.gitkeep
 !artifacts/*/
