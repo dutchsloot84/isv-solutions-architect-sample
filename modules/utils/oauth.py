@@ -288,9 +288,9 @@ def authorize_jira() -> dict:
                 "audience": "api.atlassian.com",
                 "redirect_uri_in_session": getattr(session, "redirect_uri", None),
                 "redirect_uri_in_config": config["jira"].get("redirect_uri"),
-                "authorization_code_prefix": f"{authorization_code[:6]}***"
-                if authorization_code
-                else None,
+                "authorization_code_prefix": (
+                    f"{authorization_code[:6]}***" if authorization_code else None
+                ),
                 "attempt": attempts,
             }
             LOGGER.debug(diagnostic_payload)
