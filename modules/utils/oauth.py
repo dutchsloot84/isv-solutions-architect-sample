@@ -8,10 +8,16 @@ import os
 import threading
 import time
 import webbrowser
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 from urllib.parse import parse_qs, urlparse
+
+try:
+    from zoneinfo import ZoneInfo
+except Exception:  # pragma: no cover - fallback when zoneinfo unavailable
+    ZoneInfo = None  # type: ignore[assignment]
 
 if TYPE_CHECKING:
     from requests_oauthlib import OAuth2Session
@@ -265,6 +271,7 @@ def authorize_jira() -> dict:
 
     attempts = 0
     max_attempts = 3
+    authorization_code = OAuthCallbackHandler.auth_code or ""
     while True:
         attempts += 1
         try:
@@ -274,13 +281,60 @@ def authorize_jira() -> dict:
                 LOGGER.debug(
                     "Redirect URI already set on session; omitting duplicate argument.",
                 )
-            token = session.fetch_token(
-                token_url=token_url,
-                code=OAuthCallbackHandler.auth_code,
-                auth=(client_id, client_secret),
-                include_client_id=False,
-                verify=str(verify_target) if verify_target else True,
-            )
+            diagnostic_payload = {
+                "action": "token_exchange_request",
+                "token_url": token_url,
+                "client_id_prefix": f"{client_id_prefix}***",
+                "audience": "api.atlassian.com",
+                "redirect_uri_in_session": getattr(session, "redirect_uri", None),
+                "redirect_uri_in_config": config["jira"].get("redirect_uri"),
+                "authorization_code_prefix": (
+                    f"{authorization_code[:6]}***" if authorization_code else None
+                ),
+                "attempt": attempts,
+            }
+            LOGGER.debug(diagnostic_payload)
+            _write_oauth_debug_snapshot(diagnostic_payload)
+            try:
+                token = session.fetch_token(
+                    token_url=token_url,
+                    code=authorization_code,
+                    auth=(client_id, client_secret),
+                    include_client_id=False,
+                    verify=str(verify_target) if verify_target else True,
+                )
+            except Exception as error:  # noqa: BLE001 - propagate rich context
+                response = getattr(error, "response", None)
+                if response is not None:
+                    headers = dict(getattr(response, "headers", {}))
+                    if "Authorization" in headers:
+                        headers["Authorization"] = "***"
+                    if "authorization" in headers:
+                        headers["authorization"] = "***"
+                    error_payload = {
+                        "event": "oauth_token_exchange_http_error",
+                        "status_code": getattr(response, "status_code", None),
+                        "response_text": getattr(response, "text", ""),
+                        "headers": headers,
+                        "attempt": attempts,
+                    }
+                    LOGGER.error(error_payload)
+                    _write_oauth_debug_snapshot({**diagnostic_payload, **error_payload})
+                else:
+                    error_payload = {
+                        "event": "oauth_token_exchange_exception",
+                        "error": str(error),
+                        "attempt": attempts,
+                    }
+                    LOGGER.error(error_payload)
+                    _write_oauth_debug_snapshot({**diagnostic_payload, **error_payload})
+                raise
+            success_payload = {
+                "event": "oauth_token_exchange_success",
+                "attempt": attempts,
+            }
+            LOGGER.debug(success_payload)
+            _write_oauth_debug_snapshot({**diagnostic_payload, **success_payload})
             if attempts > 1:
                 LOGGER.info(
                     "Token exchange succeeded after %s attempts",
@@ -347,6 +401,25 @@ def authorize_jira() -> dict:
 
     save_token(token, config)
     return token
+
+
+def _write_oauth_debug_snapshot(payload: dict) -> None:
+    """Persist diagnostic payloads for OAuth troubleshooting."""
+
+    try:
+        tz = ZoneInfo("America/Phoenix") if ZoneInfo else timezone.utc
+    except Exception:  # pragma: no cover - fallback if timezone unavailable
+        tz = timezone.utc
+
+    timestamp = datetime.now(tz).strftime("%Y%m%dT%H%M%S%f%z")
+    logs_dir = Path("logs")
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    snapshot_path = logs_dir / f"oauth_debug_{timestamp}.json"
+
+    try:
+        snapshot_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
+    except Exception:  # noqa: BLE001 - diagnostics should not raise
+        LOGGER.debug("Failed to write OAuth debug snapshot", exc_info=True)
 
 
 def complete_authorization(auth_code: str) -> dict:
