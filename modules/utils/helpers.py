@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+LOGGER = logging.getLogger(__name__)
 
 
 def project_root() -> Path:
@@ -76,8 +79,8 @@ def current_timestamp(tz: Optional[str] = None) -> datetime:
             from zoneinfo import ZoneInfo
 
             return datetime.now(tz=ZoneInfo(tz))
-        except Exception:  # pragma: no cover
-            pass
+        except Exception as exc:  # pragma: no cover
+            LOGGER.debug("Falling back to UTC after timezone resolution error: %s", exc)
     return datetime.now(timezone.utc)
 
 
@@ -102,9 +105,7 @@ def read_json(path: Path | str) -> Dict[str, Any]:
         return json.load(handle)
 
 
-def latest_snapshot_files(
-    snapshot_dir: Path | str, limit: int = 2
-) -> list[Path]:
+def latest_snapshot_files(snapshot_dir: Path | str, limit: int = 2) -> list[Path]:
     """Return the most recent snapshot files sorted newest-first."""
     directory = Path(snapshot_dir)
     snapshots = sorted(directory.glob("snapshot_*.json"), reverse=True)

@@ -43,7 +43,9 @@ def run_pytest_with_coverage(extra_args: Sequence[str] | None = None) -> int:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run pytest with coverage artifacts")
-    parser.add_argument("pytest_args", nargs=argparse.REMAINDER, help="Arguments to forward to pytest")
+    parser.add_argument(
+        "pytest_args", nargs=argparse.REMAINDER, help="Arguments to forward to pytest"
+    )
     parsed = parser.parse_args(argv)
     return run_pytest_with_coverage(parsed.pytest_args)
 

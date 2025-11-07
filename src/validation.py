@@ -18,9 +18,7 @@ SCHEMA_FILENAME = "jira_issue_schema.json"
 def _schema_path() -> Path:
     project_schema = helpers.project_root() / "schemas" / SCHEMA_FILENAME
     if not project_schema.exists():
-        raise FileNotFoundError(
-            f"Jira issue schema not found at {project_schema}."
-        )
+        raise FileNotFoundError(f"Jira issue schema not found at {project_schema}.")
     return project_schema
 
 
@@ -115,7 +113,8 @@ def validate_issue(issue: Mapping[str, Any]) -> tuple[bool, list[str]]:
             continue
         if isinstance(value, list):
             errors.extend(
-                f"Field '{field}' {detail}" for detail in _validate_array(value, schema_entry)
+                f"Field '{field}' {detail}"
+                for detail in _validate_array(value, schema_entry)
             )
     return not errors, errors
 
@@ -156,4 +155,3 @@ def filter_valid_issues(
             continue
         valid.append(dict(issue))
     return valid
-

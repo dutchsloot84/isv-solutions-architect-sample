@@ -1,7 +1,7 @@
-"""CLI orchestration utilities for the Release Intelligence build phase."""
+"""CLI orchestration utilities for the Release Intelligence guard phase."""
 
 from .cli import Orchestrator, main
-from .versioning import ReleasePlan, VersionManager, VersioningError
+from .versioning import ReleasePlan, VersioningError, VersionManager
 
 __all__ = [
     "Orchestrator",

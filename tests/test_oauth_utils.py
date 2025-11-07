@@ -16,7 +16,9 @@ def test_token_expired_handles_variations() -> None:
     assert not oauth_utils._token_expired({"expires_at": time.time() + 3600})
 
 
-def test_get_jira_session_refreshes_expired_token(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_get_jira_session_refreshes_expired_token(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     saved_tokens: list[Dict[str, Any]] = []
 
     def fake_save(token: Dict[str, Any], config: Optional[dict] = None) -> Path:
@@ -39,8 +41,16 @@ def test_get_jira_session_refreshes_expired_token(monkeypatch: pytest.MonkeyPatc
             return new_token
 
     monkeypatch.setattr(oauth_utils, "save_token", fake_save)
-    monkeypatch.setattr(oauth_utils, "_load_token", lambda config: {"access_token": "old", "expires_at": time.time() - 5})
-    monkeypatch.setattr(oauth_utils, "_build_oauth_session", lambda config, token=None: DummySession(token))
+    monkeypatch.setattr(
+        oauth_utils,
+        "_load_token",
+        lambda config: {"access_token": "old", "expires_at": time.time() - 5},
+    )
+    monkeypatch.setattr(
+        oauth_utils,
+        "_build_oauth_session",
+        lambda config, token=None: DummySession(token),
+    )
     monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: tmp_path / "corp.pem")
     monkeypatch.setattr(
         oauth_utils,

@@ -76,9 +76,16 @@ def test_load_config_missing_file_returns_defaults(monkeypatch, tmp_path):
 
     defaults = {
         "jira": {
-            "base_url": "https://example", "auth_url": "https://auth", "token_url": "https://token", "api_scope": "scope"
+            "base_url": "https://example",
+            "auth_url": "https://auth",
+            "token_url": "https://token",
+            "api_scope": "scope",
         },
-        "paths": {"snapshot_dir": "snapshots", "logs_dir": "logs", "reports_dir": "reports"},
+        "paths": {
+            "snapshot_dir": "snapshots",
+            "logs_dir": "logs",
+            "reports_dir": "reports",
+        },
     }
 
     config = load_config(override_path=tmp_path / "missing.yaml", defaults=defaults)

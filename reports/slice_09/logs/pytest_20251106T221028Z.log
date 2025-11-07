@@ -1,0 +1,17 @@
+===================================================== test session starts ======================================================
+platform linux -- Python 3.12.10, pytest-8.4.2, pluggy-1.6.0
+rootdir: /workspace/release-intelligence
+plugins: cov-7.0.0
+collected 26 items
+
+tests/test_config_loader.py ....                                                                                         [ 15%]
+tests/test_http_retry.py ...                                                                                             [ 26%]
+tests/test_logging_factory.py ...                                                                                        [ 38%]
+tests/test_oauth_utils.py ..                                                                                             [ 46%]
+tests/test_orchestrator_cli.py ....                                                                                      [ 61%]
+tests/test_readiness_reporter.py ....                                                                                    [ 76%]
+tests/test_run_tests_script.py ..                                                                                        [ 84%]
+tests/test_snapshot_delta_analyzer.py ..                                                                                 [ 92%]
+tests/test_snapshot_module.py ..                                                                                         [100%]
+
+====================================================== 26 passed in 0.51s ======================================================

@@ -1,0 +1,28 @@
+ruff.....................................................................[42mPassed[m
+black....................................................................[41mFailed[m
+[2m- hook id: black[m
+[2m- files were modified by this hook[m
+
+[1mreformatted scripts/add_to_project.py[0m
+
+[1mAll done! ✨ 🍰 ✨[0m
+[34m[1m1 file [0m[1mreformatted[0m, [34m34 files [0mleft unchanged.
+
+mypy.....................................................................[41mFailed[m
+[2m- hook id: mypy[m
+[2m- exit code: 2[m
+
+modules/summarize.py:9: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"jinja2"(B[m  (B[m[33m[import-not-found](B[m
+modules/summarize.py:9: [34mnote:(B[m See [4mhttps://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports(B[m(B[m
+modules/utils/oauth.py:15: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"requests_oauthlib"(B[m  (B[m[33m[import-not-found](B[m
+scripts/run_tests.py: [1m[31merror:(B[m Source file found twice under different module names: (B[m[1m"run_tests"(B[m and (B[m[1m"scripts.run_tests"(B[m(B[m[33m(B[m
+scripts/run_tests.py:9: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"pytest"(B[m  (B[m[33m[import-not-found](B[m
+tests/test_config_loader.py:9: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"pytest"(B[m  (B[m[33m[import-not-found](B[m
+tests/test_http_retry.py:3: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"pytest"(B[m  (B[m[33m[import-not-found](B[m
+tests/test_oauth_utils.py:7: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"pytest"(B[m  (B[m[33m[import-not-found](B[m
+tests/test_orchestrator_cli.py:12: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"pytest"(B[m  (B[m[33m[import-not-found](B[m
+tests/test_readiness_reporter.py:7: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"pytest"(B[m  (B[m[33m[import-not-found](B[m
+[1m[31mFound 9 errors in 8 files (errors prevented further checking)(B[m
+
+bandit...................................................................[42mPassed[m
+pytest...................................................................[42mPassed[m

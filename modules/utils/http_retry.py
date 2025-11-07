@@ -11,7 +11,6 @@ from requests.exceptions import ConnectionError, SSLError, Timeout
 
 from .logger import get_logger
 
-
 LOGGER = get_logger(__name__)
 
 
@@ -113,7 +112,8 @@ def request_with_retry(
 
         return response
 
-    assert last_exception is not None  # pragma: no cover - defensive
+    if last_exception is None:  # pragma: no cover - defensive
+        raise RuntimeError("HTTP retry exhausted without capturing an exception.")
     raise last_exception
 
 

@@ -167,7 +167,9 @@ def analyze_snapshots(
     return {"metadata": metadata, "summary": summary, "details": details}
 
 
-def analyze_snapshot_files(current_path: Path | str, previous_path: Path | str) -> Dict[str, Any]:
+def analyze_snapshot_files(
+    current_path: Path | str, previous_path: Path | str
+) -> Dict[str, Any]:
     """Load snapshot files from disk and compute the delta."""
 
     current_snapshot = helpers.read_json(current_path)
@@ -295,15 +297,23 @@ def _write_json(data: Mapping[str, Any], output_path: Optional[Path | str]) -> N
     _write_output(payload, output_path)
 
 
-def _write_markdown(delta: Mapping[str, Any], output_path: Optional[Path | str]) -> None:
+def _write_markdown(
+    delta: Mapping[str, Any], output_path: Optional[Path | str]
+) -> None:
     markdown = format_markdown_report(delta)
     _write_output(markdown, output_path)
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Analyze differences between OAuth snapshot exports")
-    parser.add_argument("--current", required=True, help="Path to the newer snapshot file")
-    parser.add_argument("--previous", required=True, help="Path to the older snapshot file")
+    parser = argparse.ArgumentParser(
+        description="Analyze differences between OAuth snapshot exports"
+    )
+    parser.add_argument(
+        "--current", required=True, help="Path to the newer snapshot file"
+    )
+    parser.add_argument(
+        "--previous", required=True, help="Path to the older snapshot file"
+    )
     parser.add_argument(
         "--format",
         choices=("json", "markdown"),

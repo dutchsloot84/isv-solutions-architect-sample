@@ -1,0 +1,101 @@
+ruff.....................................................................[42mPassed[m
+black....................................................................[42mPassed[m
+mypy.....................................................................[41mFailed[m
+[2m- hook id: mypy[m
+[2m- exit code: 2[m
+
+modules/compare.py:10: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"deepdiff"(B[m  (B[m[33m[import-not-found](B[m
+modules/compare.py:10: [34mnote:(B[m See [4mhttps://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports(B[m(B[m
+modules/config/loader.py:11: [1m[31merror:(B[m Cannot find implementation or library stub for module named (B[m[1m"dotenv"(B[m  (B[m[33m[import-not-found](B[m
+modules/logging/__init__.py: [1m[31merror:(B[m Source file found twice under different module names: (B[m[1m"modules.logging"(B[m and (B[m[1m"logging"(B[m(B[m[33m(B[m
+modules/logging/__init__.py: [34mnote:(B[m See [4mhttps://mypy.readthedocs.io/en/stable/running_mypy.html#mapping-file-paths-to-modules(B[m for more info(B[m
+modules/logging/__init__.py: [34mnote:(B[m Common resolutions include: a) adding `__init__.py` somewhere, b) using `--explicit-package-bases` or adjusting MYPYPATH(B[m
+[1m[31mFound 3 errors in 3 files (errors prevented further checking)(B[m
+
+bandit...................................................................[41mFailed[m
+[2m- hook id: bandit[m
+[2m- exit code: 1[m
+
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.12.10
+[95mRun started:2025-11-06 22:07:37.130867[0m
+[95m
+Test results:[0m
+[94m>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b110_try_except_pass.html
+   Location: ./modules/utils/helpers.py:79:8[0m
+78	            return datetime.now(tz=ZoneInfo(tz))
+79	        except Exception:  # pragma: no cover
+80	            pass
+81	    return datetime.now(timezone.utc)
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./modules/utils/http_retry.py:115:4[0m
+114	
+115	    assert last_exception is not None  # pragma: no cover - defensive
+116	    raise last_exception
+
+--------------------------------------------------
+[94m>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: ./scripts/add_to_project.py:9:0[0m
+8	import logging
+9	import subprocess
+10	import sys
+
+--------------------------------------------------
+[94m>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./scripts/add_to_project.py:59:17[0m
+58	        logging.debug("Fetching existing project items with command: %s", " ".join(cmd))
+59	        result = subprocess.run(
+60	            cmd,
+61	            check=True,
+62	            capture_output=True,
+63	            text=True,
+64	        )
+65	    except FileNotFoundError as exc:
+
+--------------------------------------------------
+[94m>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./scripts/add_to_project.py:137:8[0m
+136	    try:
+137	        subprocess.run(cmd, check=True)
+138	        message = f"✅ Added {project_title}"
+
+--------------------------------------------------
+[95m
+Code scanned:[0m
+	Total lines of code: 2573
+	Total lines skipped (#nosec): 0
+[95m
+Run metrics:[0m
+	Total issues (by severity):
+		Undefined: 0
+		Low: 5
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 5
+[95mFiles skipped (0):[0m
+
+pytest...................................................................[42mPassed[m

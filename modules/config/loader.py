@@ -104,7 +104,11 @@ class ConfigLoader:
 
     # -- internal helpers -------------------------------------------------
     def _load_dotenv(self) -> None:
-        path = Path(self.dotenv_path).expanduser() if self.dotenv_path else self._project_root() / ".env"
+        path = (
+            Path(self.dotenv_path).expanduser()
+            if self.dotenv_path
+            else self._project_root() / ".env"
+        )
         if path.exists():
             if load_dotenv is not None:
                 load_dotenv(dotenv_path=path)  # type: ignore[arg-type]
@@ -118,18 +122,26 @@ class ConfigLoader:
                 os.environ.setdefault(key.strip(), value.strip())
 
     def _read_config(self) -> Dict[str, Any]:
-        config_file = Path(self.config_path).expanduser() if self.config_path else self._default_config_path()
+        config_file = (
+            Path(self.config_path).expanduser()
+            if self.config_path
+            else self._default_config_path()
+        )
         if not config_file.exists():
             return {}
 
         with config_file.open("r", encoding="utf-8") as stream:
             loaded = yaml.safe_load(stream) or {}
         if not isinstance(loaded, MutableMapping):
-            raise ConfigValidationError(["Configuration file must contain a mapping at the top level."])
+            raise ConfigValidationError(
+                ["Configuration file must contain a mapping at the top level."]
+            )
         return dict(loaded)
 
     def _apply_defaults(self, config: Mapping[str, Any]) -> Dict[str, Any]:
-        merged: Dict[str, Any] = {section: dict(values) for section, values in self.defaults.items()}
+        merged: Dict[str, Any] = {
+            section: dict(values) for section, values in self.defaults.items()
+        }
         for section, values in config.items():
             if isinstance(values, Mapping):
                 merged.setdefault(section, {})
@@ -143,10 +155,15 @@ class ConfigLoader:
             value = os.getenv(env_var)
             if value:
                 section_values = config.setdefault(section, {})
-                if isinstance(section_values, Mapping):
+                if isinstance(section_values, MutableMapping):
                     section_values[key] = value
-                else:
-                    config[section] = {key: value}
+                    continue
+                if isinstance(section_values, Mapping):
+                    mutable_section = dict(section_values)
+                    mutable_section[key] = value
+                    config[section] = mutable_section
+                    continue
+                config[section] = {key: value}
         return config
 
     def _validate(self, config: Mapping[str, Any]) -> None:
@@ -187,5 +204,9 @@ def load_config(
 ) -> Dict[str, Any]:
     """Convenience wrapper returning the loaded configuration."""
 
-    loader = ConfigLoader(config_path=override_path, dotenv_path=dotenv_path, defaults=defaults or DEFAULTS)
+    loader = ConfigLoader(
+        config_path=override_path,
+        dotenv_path=dotenv_path,
+        defaults=defaults or DEFAULTS,
+    )
     return loader.load()

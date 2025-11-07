@@ -84,11 +84,10 @@ def parse_args() -> argparse.Namespace:
         description="Generate Jira release readiness snapshots"
     )
     parser.add_argument(
-        "--fixVersion", help="Fix version to evaluate. Overrides FIX_VERSION env if provided.",
+        "--fixVersion",
+        help="Fix version to evaluate. Overrides FIX_VERSION env if provided.",
     )
-    parser.add_argument(
-        "--update", action="store_true", help="Force snapshot refresh"
-    )
+    parser.add_argument("--update", action="store_true", help="Force snapshot refresh")
     return parser.parse_args()
 
 

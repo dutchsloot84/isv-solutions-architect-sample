@@ -40,8 +40,8 @@ class Orchestrator:
     report_builder: ReportBuilder = summarize.create_markdown_report
     version_manager: VersionManager = field(default_factory=VersionManager)
 
-    slice_id: str = "05"
-    phase: str = "build"
+    slice_id: str = "09"
+    phase: str = "guard"
 
     def __post_init__(self) -> None:
         self.env = dict(os.environ) if self.env is None else dict(self.env)
@@ -62,19 +62,22 @@ class Orchestrator:
         self._validate_environment()
         usage_path = self._usage_artifact_path()
         lines = [
-            "# CLI Orchestrator Usage",
+            "# CLI Orchestrator Usage – Guard Phase",
             "",
             f"- **Slice:** {self.slice_id}",
             f"- **Phase:** {self.phase}",
             "- **Commands:** `analyze`, `execute`, `validate`.",
             "- **Required env vars:** `JIRA_CLIENT_ID`, `JIRA_SECRET`, `SSL_CERT_PATH`, `ARTIFACT_ROOT`, `FIX_VERSION`.",
             "- **Masking:** Secrets logged via the JSON logger are replaced with `***`.",
-            "- **Artifacts:** progress JSON, usage notes, readiness report, release notes.",
+            "- **Artifacts:** progress JSON, usage notes, readiness report, release notes, pre-commit logs.",
             "",
             "## Notes",
             "- Ensure analyzers from Slices 01-04 are installed in the environment.",
             "- Provide a writable `${ARTIFACT_ROOT}` for logs and reports.",
+            "- Review Slice 08 validation outputs in `${ARTIFACT_ROOT}/validation/08/` and related reports for regressions.",
+            "- Reference `${ARTIFACT_ROOT}/reports/slice_08_<timestamp>.md` and `/reports/weekly_summary_<latest>.md` for context.",
             "- Capture blockers or dependency gaps below.",
+            "- Guard Phase requires `.pre-commit-config.yaml` and hook activation notes to remain current.",
             "",
             "> Update this file with findings from each Analyze pass.",
         ]
@@ -141,7 +144,9 @@ class Orchestrator:
             "timestamp": helpers.current_timestamp().isoformat(),
         }
         self._write_progress("validate", evidence)
-        self._logger.info("Validation recorded", extra={"progress": str(self._progress_path)})
+        self._logger.info(
+            "Validation recorded", extra={"progress": str(self._progress_path)}
+        )
         return self._progress_path
 
     # -- CLI entry ---------------------------------------------------
@@ -219,6 +224,7 @@ class Orchestrator:
 
 
 # -- CLI glue ---------------------------------------------------------
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
