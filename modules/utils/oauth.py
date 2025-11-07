@@ -372,7 +372,9 @@ if __name__ == "__main__":
         "complete", help="Exchange an authorization code for tokens"
     )
     complete_parser.add_argument("auth_code", help="Authorization code from Jira")
-    complete_parser.set_defaults(func=lambda args: complete_authorization(args.auth_code))
+    complete_parser.set_defaults(
+        func=lambda args: complete_authorization(args.auth_code)
+    )
 
     cli_args = parser.parse_args()
     cli_args.func(cli_args)
