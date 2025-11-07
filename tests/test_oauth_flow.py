@@ -103,9 +103,7 @@ def test_token_exchange_success(
     assert dummy_session.fetch_kwargs is not None
     assert dummy_session.fetch_kwargs["auth"] == ("abcd1234client", "supersecret")
     assert dummy_session.fetch_kwargs["include_client_id"] is False
-    assert (
-        dummy_session.fetch_kwargs["redirect_uri"] == "http://localhost:8000/callback"
-    )
+    assert "redirect_uri" not in dummy_session.fetch_kwargs
     assert dummy_session.fetch_kwargs["verify"] is True
     assert dummy_session.fetch_attempts == 2
 

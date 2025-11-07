@@ -268,12 +268,17 @@ def authorize_jira() -> dict:
     while True:
         attempts += 1
         try:
+            if hasattr(session, "_client") and getattr(
+                session._client, "redirect_uri", None
+            ):
+                LOGGER.debug(
+                    "Redirect URI already set on session; omitting duplicate argument.",
+                )
             token = session.fetch_token(
                 token_url=token_url,
                 code=OAuthCallbackHandler.auth_code,
                 auth=(client_id, client_secret),
                 include_client_id=False,
-                redirect_uri=config["jira"].get("redirect_uri"),
                 verify=str(verify_target) if verify_target else True,
             )
             if attempts > 1:
