@@ -231,7 +231,7 @@ def test_authorize_jira_persists_token_and_logs_success(
     oauth_utils.OAuthCallbackHandler.auth_code = "auth-code-123"
     oauth_utils.OAuthCallbackHandler.error = None
 
-    token = oauth_utils.authorize_jira()
+    oauth_utils.authorize_jira()
 
     assert token_path.exists()
     data = json.loads(token_path.read_text(encoding="utf-8"))
