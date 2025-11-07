@@ -223,9 +223,7 @@ class Orchestrator:
         events: list[Dict[str, object]]
         if isinstance(events_data, list):
             events = [
-                dict(event)
-                for event in events_data
-                if isinstance(event, Mapping)
+                dict(event) for event in events_data if isinstance(event, Mapping)
             ]
         else:
             events = []
