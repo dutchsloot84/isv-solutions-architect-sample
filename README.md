@@ -106,19 +106,23 @@ pipeline focused on essential quality and reporting tasks.
 ### First Run
 - **Step 1:** Authenticate with Jira:
   ```bash
-  python scripts/oauth_snapshot.py
+  python -m modules.utils.oauth authorize
   ```
-- **Step 2:** Run snapshot analyzer:
+- **Step 2:** Capture a snapshot and build the readiness report:
   ```bash
-  python -m src.snapshot_analyzer
+  python main.py --fixVersion "Mobilitas 2025.11.14"
   ```
-- **Step 3:** Validate data:
+- **Step 3:** Validate data changes between two snapshots:
   ```bash
-  python -m src.validation
+  python -m modules.snapshot_delta.analyzer --current <latest_snapshot.json> --previous <prior_snapshot.json>
   ```
-- **Step 4:** Generate delta:
+- **Step 4:** (Optional) Export a Markdown delta report:
   ```bash
-  python -m src.delta_analyzer
+  python -m modules.snapshot_delta.analyzer \
+    --current <latest_snapshot.json> \
+    --previous <prior_snapshot.json> \
+    --format markdown \
+    --output artifacts/reports/delta.md
   ```
 
 ### Expected Outputs
