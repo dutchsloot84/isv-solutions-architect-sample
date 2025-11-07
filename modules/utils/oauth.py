@@ -8,7 +8,7 @@ import os
 import threading
 import time
 import webbrowser
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
@@ -55,7 +55,7 @@ else:
 
 import requests
 
-from .helpers import load_config, resolve_path, ssl_verify_path
+from .helpers import load_config, project_root, resolve_path, ssl_verify_path
 from .logger import get_logger
 
 LOGGER = get_logger(__name__)
@@ -134,24 +134,57 @@ def _build_oauth_session(config: dict, token: Optional[dict] = None) -> OAuth2Se
     )
 
 
+def _default_token_path() -> Path:
+    """Return the default filesystem location for Jira OAuth tokens."""
+
+    return project_root() / ".secrets" / "jira_token.json"
+
+
+def _resolve_token_path(config: Optional[dict]) -> Path:
+    cfg = config or load_config()
+    configured_path = cfg.get("jira", {}).get("token_path")
+    if configured_path:
+        return resolve_path(configured_path)
+    return _default_token_path()
+
+
 def save_token(token: dict, config: Optional[dict] = None) -> Path:
     """Persist the OAuth token to disk."""
-    cfg = config or load_config()
-    token_path = resolve_path(cfg["jira"].get("token_path", "~/.jira_token.json"))
+    token_path = _resolve_token_path(config)
     token_path.parent.mkdir(parents=True, exist_ok=True)
     with token_path.open("w", encoding="utf-8") as handle:
-        json.dump(token, handle)
-    LOGGER.info("OAuth token saved to disk")
+        json.dump(token, handle, indent=2)
+    LOGGER.info("OAuth token saved to %s", token_path)
     return token_path
 
 
 def _load_token(config: dict) -> Optional[dict]:
-    token_path = resolve_path(config["jira"].get("token_path", "~/.jira_token.json"))
+    configured_path = config.get("jira", {}).get("token_path")
+    token_path = (
+        resolve_path(configured_path)
+        if configured_path
+        else _default_token_path()
+    )
     if not token_path.exists():
         return None
     with token_path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
 
+
+def token_is_valid(token: dict) -> bool:
+    """Return True when the token is present and not close to expiry."""
+
+    expires_at = token.get("expires_at")
+    if not expires_at:
+        return False
+
+    try:
+        expiry = datetime.fromtimestamp(float(expires_at), tz=timezone.utc)
+    except (TypeError, ValueError):
+        return False
+
+    buffer = timedelta(minutes=5)
+    return datetime.now(timezone.utc) < (expiry - buffer)
 
 def _should_open_browser() -> bool:
     """Determine whether to launch the user's browser automatically."""
@@ -166,6 +199,15 @@ def _should_open_browser() -> bool:
 def authorize_jira() -> dict:
     """Perform the initial Jira OAuth authorization flow and return the token."""
     config = load_config()
+    existing_token = _load_token(config)
+    if existing_token and token_is_valid(existing_token):
+        print("✅ Existing Jira access token is still valid.")
+        LOGGER.info(
+            "Existing Jira access token is valid; skipping authorization",
+            extra={"event": "oauth_authorize_skip", "slice_id": "07"},
+        )
+        return existing_token
+
     auth_url = config["jira"].get("auth_url")
     audience = (
         os.environ.get("JIRA_AUDIENCE")
@@ -231,12 +273,34 @@ def authorize_jira() -> dict:
         "code and run:\n\npython -m modules.utils.oauth complete <auth_code>\n"
     )
 
+    start_time = time.monotonic()
+    fallback_notified = False
+
     try:
         while (
             OAuthCallbackHandler.auth_code is None
             and OAuthCallbackHandler.error is None
         ):
             time.sleep(0.2)
+            if (
+                not fallback_notified
+                and time.monotonic() - start_time > 30
+            ):
+                fallback_notified = True
+                LOGGER.warning(
+                    "⚠️ Did not receive an authorization callback automatically.",
+                    extra={
+                        "event": "oauth_authorize_callback_timeout",
+                        "slice_id": "07",
+                    },
+                )
+                print("\n⚠️ Did not receive an authorization callback automatically.")
+                print(
+                    "If your browser did not redirect, copy the code from the URL and run:"
+                )
+                print(
+                    "python -m modules.utils.oauth complete <auth_code>"
+                )
     except KeyboardInterrupt:  # pragma: no cover - interactive flow
         print(
             "\nAuthorization flow interrupted. If you obtained an authorization code, run:\n"
@@ -399,7 +463,21 @@ def authorize_jira() -> dict:
                 )
             raise
 
-    save_token(token, config)
+    if "expires_at" not in token and "expires_in" in token:
+        try:
+            token["expires_at"] = time.time() + float(token["expires_in"])
+        except (TypeError, ValueError):
+            LOGGER.debug("Unable to derive expires_at from expires_in", exc_info=True)
+
+    token_path = save_token(token, config)
+    OAuthCallbackHandler.auth_code = None
+    OAuthCallbackHandler.error = None
+    LOGGER.info(
+        "✅ Access token successfully retrieved and saved to %s",
+        token_path,
+        extra={"event": "oauth_token_exchange_complete", "slice_id": "07"},
+    )
+    print("\n🎉 Jira authorization complete! Token saved securely for future use.")
     return token
 
 
@@ -473,6 +551,12 @@ def complete_authorization(auth_code: str) -> dict:
         )
         raise error
     tokens = response.json()
+
+    if "expires_at" not in tokens and "expires_in" in tokens:
+        try:
+            tokens["expires_at"] = time.time() + float(tokens["expires_in"])
+        except (TypeError, ValueError):
+            LOGGER.debug("Unable to derive expires_at from expires_in", exc_info=True)
 
     token_path = save_token(tokens, config)
     print(f"✅ Authorization successful. Tokens saved to {token_path}")
