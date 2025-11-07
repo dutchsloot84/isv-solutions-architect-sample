@@ -1,0 +1,19 @@
+modules/config/loader.py:16: error: Library stubs not installed for "yaml"  [import-untyped]
+modules/config/loader.py:16: note: Hint: "python3 -m pip install types-PyYAML"
+modules/config/loader.py:16: note: (or run "mypy --install-types" to install all missing stub packages)
+modules/config/loader.py:16: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+modules/compare.py:13: error: Name "DeepDiff" already defined (possibly by an import)  [no-redef]
+modules/compare.py:13: note: Error code "no-redef" not covered by "type: ignore" comment
+modules/utils/oauth.py:17: error: Library stubs not installed for "requests"  [import-untyped]
+modules/utils/oauth.py:19: error: Name "OAuth2Session" already defined (possibly by an import)  [no-redef]
+modules/utils/oauth.py:19: note: Error code "no-redef" not covered by "type: ignore" comment
+modules/utils/http_retry.py:9: error: Library stubs not installed for "requests"  [import-untyped]
+modules/utils/http_retry.py:10: error: Library stubs not installed for "requests.exceptions"  [import-untyped]
+modules/utils/http_retry.py:10: note: Hint: "python3 -m pip install types-requests"
+modules/readiness/reporter.py:327: error: Unsupported target for indexed assignment ("Collection[Collection[str]]")  [index]
+modules/readiness/reporter.py:328: error: Unsupported target for indexed assignment ("Collection[Collection[str]]")  [index]
+modules/readiness/reporter.py:329: error: Unsupported target for indexed assignment ("Collection[Collection[str]]")  [index]
+modules/orchestrator/cli.py:164: error: Item "None" of "Mapping[str, str] | None" has no attribute "get"  [union-attr]
+modules/orchestrator/cli.py:169: error: Item "None" of "Mapping[str, str] | None" has no attribute "get"  [union-attr]
+modules/orchestrator/cli.py:219: error: Argument 1 to "list" has incompatible type "Any | object"; expected "Iterable[Any]"  [arg-type]
+Found 12 errors in 6 files (checked 23 source files)
