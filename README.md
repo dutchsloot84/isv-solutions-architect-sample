@@ -40,10 +40,23 @@ pip install -r requirements.txt
 Run the authorization flow locally. This launches a browser window where you can complete the Jira login and grant permissions.
 
 ```bash
+# 1️⃣ Authorize Jira access (automatic browser launch)
 python -m modules.utils.oauth authorize
+
+# 2️⃣ If login fails or redirects to home.atlassian.com
+# Copy the code from the final URL (after ?code=) and run:
+python -m modules.utils.oauth complete <auth_code>
 ```
 
 This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `~/.jira_token.json`). SSL verification honors `SSL_CERT_PATH`, and tokens are masked in logs.
+
+### Troubleshooting OAuth Login
+
+- If your corporate browser blocks redirects or incognito mode:
+  - Copy the printed URL from the console.
+  - Paste it into any browser where you are logged into Jira.
+  - When redirected to a blank or error page, copy the URL code (`?code=XYZ`).
+  - Run the `complete` command above to finish setup.
 
 ## Usage
 
@@ -106,7 +119,12 @@ pipeline focused on essential quality and reporting tasks.
 ### First Run
 - **Step 1:** Authenticate with Jira:
   ```bash
+  # 1️⃣ Authorize Jira access (automatic browser launch)
   python -m modules.utils.oauth authorize
+
+  # 2️⃣ If login fails or redirects to home.atlassian.com
+  # Copy the code from the final URL (after ?code=) and run:
+  python -m modules.utils.oauth complete <auth_code>
   ```
 - **Step 2:** Capture a snapshot and build the readiness report:
   ```bash
