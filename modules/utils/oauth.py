@@ -335,11 +335,26 @@ def authorize_jira() -> dict:
     )
 
     requested_scopes = _resolve_requested_scopes(config)
+    normalized_scopes = _scopes_to_oauthlib(requested_scopes) or []
     session = _build_oauth_session(config, scopes=requested_scopes)
     current_scopes = list(requested_scopes)
     offline_scope = "offline_access"
     using_fallback_scopes = False
     offline_requested = any(scope.lower() == offline_scope for scope in current_scopes)
+
+    logs_dir_setting = config.get("paths", {}).get("logs_dir")
+    logs_dir_path = (
+        resolve_path(logs_dir_setting) if logs_dir_setting else project_root() / "logs"
+    )
+
+    scope_diagnostics = {
+        "event": "oauth_scope_normalization",
+        "requested_scopes": requested_scopes,
+        "normalized_scopes": normalized_scopes,
+        "session_scope": getattr(session, "scope", None),
+    }
+    LOGGER.debug(scope_diagnostics)
+    _write_scope_normalization_log(logs_dir_path, scope_diagnostics)
 
     redirect_uri = config["jira"].get("redirect_uri")
     LOGGER.info(
@@ -356,7 +371,6 @@ def authorize_jira() -> dict:
         auth_url,
         audience=audience,
         prompt="consent",
-        scope=_scopes_to_oauthlib(requested_scopes),
     )
 
     LOGGER.info("Starting local HTTP server to capture Jira OAuth callback")
@@ -399,10 +413,6 @@ def authorize_jira() -> dict:
         "code and run:\n\npython -m modules.utils.oauth complete <auth_code>\n"
     )
 
-    logs_dir_setting = config.get("paths", {}).get("logs_dir")
-    logs_dir_path = (
-        resolve_path(logs_dir_setting) if logs_dir_setting else project_root() / "logs"
-    )
     diagnostic_recorder = OAuthDiagnosticRecorder(current_scopes, logs_dir_path)
 
     start_time = time.monotonic()
@@ -685,6 +695,19 @@ def _write_oauth_debug_snapshot(payload: dict) -> None:
         snapshot_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
     except Exception:  # noqa: BLE001 - diagnostics should not raise
         LOGGER.debug("Failed to write OAuth debug snapshot", exc_info=True)
+
+
+def _write_scope_normalization_log(base_dir: Path, payload: dict) -> None:
+    """Persist structured diagnostics for scope normalization."""
+
+    try:
+        directory = ensure_directory(base_dir)
+        path = directory / f"oauth_scope_normalization_{_phoenix_timestamp()}.json"
+        path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    except Exception:  # noqa: BLE001 - diagnostics should not raise
+        LOGGER.debug("Failed to write OAuth scope normalization log", exc_info=True)
 
 
 def complete_authorization(auth_code: str) -> dict:
