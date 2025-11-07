@@ -1,3 +1,4 @@
+# Local environment configuration
 .env
 *.pem
 *.json
@@ -11,7 +12,10 @@ data/snapshots/*
 !data/snapshots/.gitkeep
 reports/*.md
 logs/*
-artifacts/
+artifacts/*
+!artifacts/.gitkeep
+!artifacts/*/
+!artifacts/**/.gitkeep
 # Allow orchestration JSON prompts
 !prompts/*.json
 !archive/prompts/*.json

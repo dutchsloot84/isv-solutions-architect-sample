@@ -84,3 +84,49 @@ workflows include:
 
 No additional PR title validation or pre-commit automation runs in CI, keeping the
 pipeline focused on essential quality and reporting tasks.
+
+## 🧭 Ship Phase – Local Setup & Manual Testing
+
+### Prerequisites
+- Python 3.11+
+- Access to Jira (OAuth 3LO App)
+- GitHub Personal Access Token
+- `requirements.txt` dependencies installed
+
+### Environment Setup
+1. Copy `.env.sample` to `.env` and fill in required fields.
+2. Activate virtual environment:
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+3. Verify directory structure under `/artifacts`.
+
+### First Run
+- **Step 1:** Authenticate with Jira:
+  ```bash
+  python scripts/oauth_snapshot.py
+  ```
+- **Step 2:** Run snapshot analyzer:
+  ```bash
+  python -m src.snapshot_analyzer
+  ```
+- **Step 3:** Validate data:
+  ```bash
+  python -m src.validation
+  ```
+- **Step 4:** Generate delta:
+  ```bash
+  python -m src.delta_analyzer
+  ```
+
+### Expected Outputs
+- Snapshots under `/artifacts/snapshots/`
+- Validation logs under `/artifacts/validation/`
+- Reports under `/artifacts/reports/`
+- Sanitized logs under `/artifacts/logs/`
+
+### Next Steps
+- Begin manual QA per `/docs/test_plan_ship_phase.md`
+- Log defects/enhancements in GitHub Project #5
