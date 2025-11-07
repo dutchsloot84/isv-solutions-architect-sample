@@ -703,7 +703,9 @@ def _write_scope_normalization_log(base_dir: Path, payload: dict) -> None:
     try:
         directory = ensure_directory(base_dir)
         path = directory / f"oauth_scope_normalization_{_phoenix_timestamp()}.json"
-        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
     except Exception:  # noqa: BLE001 - diagnostics should not raise
         LOGGER.debug("Failed to write OAuth scope normalization log", exc_info=True)
 
