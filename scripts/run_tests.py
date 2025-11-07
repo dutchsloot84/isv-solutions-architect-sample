@@ -9,6 +9,7 @@ from typing import Iterable, Sequence
 import pytest
 
 from modules.utils import helpers
+from src.logger import sanitize_logs
 
 DEFAULT_COV_TARGETS: tuple[str, ...] = ("modules", "src")
 
@@ -28,7 +29,7 @@ def build_pytest_args(
     helpers.ensure_directory(report_path.parent)
 
     args: list[str] = [f"--cov={target}" for target in targets]
-    args.append(f"--cov-report=term-missing:{report_path}")
+    args.append("--cov-report=term-missing")
     if extra_args:
         args.extend(extra_args)
     return args, report_path
@@ -37,8 +38,32 @@ def build_pytest_args(
 def run_pytest_with_coverage(extra_args: Sequence[str] | None = None) -> int:
     """Execute pytest with coverage reporting and return the exit code."""
 
-    args, _ = build_pytest_args(extra_args)
-    return pytest.main(args)
+    args, report_path = build_pytest_args(extra_args)
+    exit_code = pytest.main(args)
+    _write_coverage_summary(report_path)
+    if report_path.exists():
+        sanitize_logs(report_path)
+    return exit_code
+
+
+def _write_coverage_summary(report_path: Path) -> None:
+    """Persist a coverage summary to *report_path* if data is available."""
+
+    try:
+        from coverage import Coverage  # type: ignore import
+    except Exception:  # pragma: no cover - coverage optional during tests
+        return
+
+    coverage_api = Coverage()
+    try:
+        coverage_api.load()
+    except Exception:
+        return
+
+    helpers.ensure_directory(report_path.parent)
+    include = ["modules/*", "src/*"]
+    with report_path.open("w", encoding="utf-8") as handle:
+        coverage_api.report(show_missing=True, file=handle, include=include)
 
 
 def main(argv: Sequence[str] | None = None) -> int:

@@ -1,0 +1,24 @@
+Collecting bandit
+  Downloading bandit-1.8.6-py3-none-any.whl.metadata (6.9 kB)
+Requirement already satisfied: PyYAML>=5.3.1 in /root/.pyenv/versions/3.12.10/lib/python3.12/site-packages (from bandit) (6.0.3)
+Collecting stevedore>=1.20.0 (from bandit)
+  Downloading stevedore-5.5.0-py3-none-any.whl.metadata (2.2 kB)
+Collecting rich (from bandit)
+  Downloading rich-14.2.0-py3-none-any.whl.metadata (18 kB)
+Collecting markdown-it-py>=2.2.0 (from rich->bandit)
+  Downloading markdown_it_py-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /root/.pyenv/versions/3.12.10/lib/python3.12/site-packages (from rich->bandit) (2.19.2)
+Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich->bandit)
+  Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Downloading bandit-1.8.6-py3-none-any.whl (133 kB)
+Downloading stevedore-5.5.0-py3-none-any.whl (49 kB)
+Downloading rich-14.2.0-py3-none-any.whl (243 kB)
+Downloading markdown_it_py-4.0.0-py3-none-any.whl (87 kB)
+Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Installing collected packages: stevedore, mdurl, markdown-it-py, rich, bandit
+
+Successfully installed bandit-1.8.6 markdown-it-py-4.0.0 mdurl-0.1.2 rich-14.2.0 stevedore-5.5.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+
+[notice] A new release of pip is available: 25.2 -> 25.3
+[notice] To update, run: pip install --upgrade pip

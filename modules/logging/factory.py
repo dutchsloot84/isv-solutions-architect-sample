@@ -9,9 +9,10 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, Optional
+from typing import Any, Dict, Iterable, Optional
 
 from modules.utils.helpers import artifact_root, ensure_directory
+from src.logger import mask_sensitive
 
 _STANDARD_LOG_ATTRIBUTES: set[str] = {
     "name",
@@ -71,22 +72,8 @@ class _JsonFormatter(logging.Formatter):
                 continue
             payload[key] = value
 
-        masked = self._mask(payload)
+        masked = mask_sensitive(payload, secrets=self.masked_values)
         return json.dumps(masked, ensure_ascii=False)
-
-    # -- internal helpers -------------------------------------------------
-    def _mask(self, value: Any) -> Any:
-        if isinstance(value, str):
-            masked_value = value
-            for secret in self.masked_values:
-                if secret and secret in masked_value:
-                    masked_value = masked_value.replace(secret, "***")
-            return masked_value
-        if isinstance(value, Mapping):
-            return {key: self._mask(sub_value) for key, sub_value in value.items()}
-        if isinstance(value, list):
-            return [self._mask(item) for item in value]
-        return value
 
 
 @dataclass(slots=True)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 from types import SimpleNamespace
 
 from scripts import run_tests
@@ -25,7 +26,7 @@ def test_build_pytest_args_generates_artifact_path(tmp_path, monkeypatch):
     assert expected_path.parent.exists()
     assert "--cov=modules" in args
     assert "--cov=src" in args
-    assert f"--cov-report=term-missing:{expected_path}" in args
+    assert "--cov-report=term-missing" in args
     assert args[-2:] == ["-k", "snapshot"]
 
 
@@ -41,17 +42,29 @@ def test_run_pytest_with_coverage_invokes_pytest(tmp_path, monkeypatch):
 
     captured_args: list[list[str]] = []
 
+    sanitized: list[list[str]] = []
+
     def fake_pytest_main(args: list[str]) -> int:
         captured_args.append(args)
         return 0
 
+    def fake_write_coverage_summary(path: Path) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("token=dummy", encoding="utf-8")
+
+    def fake_sanitize_logs(paths):
+        sanitized.append(list(paths if isinstance(paths, (list, tuple)) else [paths]))
+
     monkeypatch.setattr(run_tests, "pytest", SimpleNamespace(main=fake_pytest_main))
+    monkeypatch.setattr(run_tests, "_write_coverage_summary", fake_write_coverage_summary)
+    monkeypatch.setattr(run_tests, "sanitize_logs", fake_sanitize_logs)
 
     exit_code = run_tests.run_pytest_with_coverage()
 
     assert exit_code == 0
     assert captured_args
     cov_args = captured_args[0]
-    assert any(item.startswith("--cov-report=term-missing:") for item in cov_args)
+    assert "--cov-report=term-missing" in cov_args
     assert any(item == "--cov=modules" for item in cov_args)
     assert any(item == "--cov=src" for item in cov_args)
+    assert sanitized

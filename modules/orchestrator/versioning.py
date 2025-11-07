@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping, Optional, Sequence
+from typing import Mapping, Optional, Sequence
 
 from modules.utils import helpers
 from modules.utils.logger import get_logger
+from src.logger import mask_sensitive
 
 SEMVER_PATTERN = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 
@@ -161,14 +161,5 @@ class VersionManager:
 
     # -- internal helpers -----------------------------------------------
     def _mask_sensitive(self, value: str) -> str:
-        masked = value
-        for secret in self._sensitive_values():
-            if secret:
-                masked = masked.replace(secret, "***")
-        return masked
-
-    def _sensitive_values(self) -> Iterable[str]:
-        return [
-            os.getenv("JIRA_SECRET", ""),
-            os.getenv("SSL_CERT_PATH", ""),
-        ]
+        masked = mask_sensitive(value)
+        return masked if isinstance(masked, str) else str(masked)

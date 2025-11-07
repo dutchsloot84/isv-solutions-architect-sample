@@ -1,0 +1,49 @@
+===================================================== test session starts ======================================================
+platform linux -- Python 3.12.10, pytest-8.4.1, pluggy-1.6.0
+rootdir: /workspace/release-intelligence
+plugins: cov-7.0.0
+collected 50 items
+
+tests/test_config_loader.py ....                                                                                         [  8%]
+tests/test_http_retry.py ...                                                                                             [ 14%]
+tests/test_logger_sanitizer.py ..........                                                                                [ 34%]
+tests/test_logging_factory.py ...                                                                                        [ 40%]
+tests/test_oauth_utils.py ..                                                                                             [ 44%]
+tests/test_orchestrator_cli.py ....                                                                                      [ 52%]
+tests/test_readiness_reporter.py ....                                                                                    [ 60%]
+tests/test_run_tests_script.py ..                                                                                        [ 64%]
+tests/test_snapshot_delta_analyzer.py ..                                                                                 [ 68%]
+tests/test_snapshot_module.py ..                                                                                         [ 72%]
+tests/test_utils_helpers.py ..............                                                                               [100%]
+
+======================================================== tests coverage ========================================================
+_______________________________________ coverage: platform linux, python 3.12.10-final-0 _______________________________________
+
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+modules/__init__.py                      0      0   100%
+modules/compare.py                      64     52    19%   11-16, 35, 43-98, 103-141
+modules/config/__init__.py               2      2     0%   3-5
+modules/config/loader.py               100     46    54%   3-81, 87-92, 95, 106, 117-124, 136, 141, 150, 153, 161-166, 169, 174-175, 183, 187, 192, 195-196, 200
+modules/logging/__init__.py              2      0   100%
+modules/logging/factory.py              80      3    96%   108, 146, 160
+modules/orchestrator/__init__.py         3      0   100%
+modules/orchestrator/cli.py            126     32    75%   95, 136-150, 155, 170, 198, 230-260, 264-279, 283
+modules/orchestrator/versioning.py      66      6    91%   86, 91, 97-99, 130
+modules/readiness/__init__.py            2      0   100%
+modules/readiness/reporter.py          240     31    87%   56, 58-61, 67, 72, 77-79, 97-100, 142-143, 195, 220-229, 236, 246-248, 254, 258, 260, 285, 381, 419
+modules/snapshot.py                     43      0   100%
+modules/snapshot_delta/__init__.py       9      2    78%   16-17
+modules/snapshot_delta/analyzer.py     196     62    68%   33, 35, 42, 48, 65, 96, 131, 175-180, 199-205, 229, 239-244, 265-279, 285-292, 296-297, 303-304, 308-327, 331-339, 343
+modules/summarize.py                    56     44    21%   10-11, 20-23, 33-36, 52-76, 81-110
+modules/utils/__init__.py                0      0   100%
+modules/utils/helpers.py                71      1    99%   53
+modules/utils/http_retry.py             50      5    90%   31-33, 89-97, 117
+modules/utils/logger.py                  9      0   100%
+modules/utils/oauth.py                 145     87    40%   16-42, 61-73, 79, 84-98, 111-117, 121-125, 130-173, 182, 189, 224-225, 231-234, 256-265, 278-289
+src/__init__.py                          2      2     0%   3-5
+src/logger.py                           85     23    73%   3-31, 39, 50, 61, 71-77, 93, 102, 119, 149
+src/validation.py                       97     24    75%   21, 52, 55, 57, 63, 68, 75, 79, 87, 95, 101, 106, 110-113, 126-137, 149-155
+------------------------------------------------------------------
+TOTAL                                 1448    422    71%
+====================================================== 50 passed in 1.28s ======================================================
