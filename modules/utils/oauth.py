@@ -278,7 +278,8 @@ def authorize_jira() -> dict:
             )
             if attempts > 1:
                 LOGGER.info(
-                    "Token exchange succeeded after %s attempts", attempts,
+                    "Token exchange succeeded after %s attempts",
+                    attempts,
                     extra={
                         "event": "oauth_token_exchange_retry_success",
                         "attempts": attempts,
@@ -286,7 +287,9 @@ def authorize_jira() -> dict:
                     },
                 )
             break
-        except Exception as error:  # noqa: BLE001 - propagate context for troubleshooting
+        except (
+            Exception
+        ) as error:  # noqa: BLE001 - propagate context for troubleshooting
             response = getattr(error, "response", None)
             status_code = getattr(response, "status_code", None)
             should_retry = (

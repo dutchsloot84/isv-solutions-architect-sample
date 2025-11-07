@@ -51,7 +51,9 @@ class DummyHTTPServer:
         self.shutdown_called = True
 
 
-def test_token_exchange_success(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_token_exchange_success(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     dummy_session = DummyOAuthSession(failures=[500])
     saved_token: Dict[str, Any] = {}
 
@@ -59,7 +61,9 @@ def test_token_exchange_success(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
     monkeypatch.setenv("JIRA_SECRET", "supersecret")
     monkeypatch.setenv("OAUTH_BROWSER_OPEN", "0")
 
-    monkeypatch.setattr(oauth_utils, "_build_oauth_session", lambda config: dummy_session)
+    monkeypatch.setattr(
+        oauth_utils, "_build_oauth_session", lambda config: dummy_session
+    )
     monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
     monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
     monkeypatch.setattr(oauth_utils.webbrowser, "open", lambda *_: True)
@@ -99,7 +103,9 @@ def test_token_exchange_success(monkeypatch: pytest.MonkeyPatch, tmp_path: Path)
     assert dummy_session.fetch_kwargs is not None
     assert dummy_session.fetch_kwargs["auth"] == ("abcd1234client", "supersecret")
     assert dummy_session.fetch_kwargs["include_client_id"] is False
-    assert dummy_session.fetch_kwargs["redirect_uri"] == "http://localhost:8000/callback"
+    assert (
+        dummy_session.fetch_kwargs["redirect_uri"] == "http://localhost:8000/callback"
+    )
     assert dummy_session.fetch_kwargs["verify"] is True
     assert dummy_session.fetch_attempts == 2
 
