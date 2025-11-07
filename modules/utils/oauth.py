@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import threading
 import time
+import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional
@@ -44,6 +46,8 @@ else:
             def get(self, url, **kwargs):
                 return self._session.get(url, **kwargs)
 
+
+import requests
 
 from .helpers import load_config, resolve_path, ssl_verify_path
 from .logger import get_logger
@@ -128,6 +132,16 @@ def _load_token(config: dict) -> Optional[dict]:
         return json.load(handle)
 
 
+def _should_open_browser() -> bool:
+    """Determine whether to launch the user's browser automatically."""
+
+    toggle = os.environ.get("OAUTH_BROWSER_OPEN")
+    if toggle is None:
+        return True
+
+    return toggle.strip().lower() not in {"0", "false", "no"}
+
+
 def authorize_jira() -> dict:
     """Perform the initial Jira OAuth authorization flow and return the token."""
     config = load_config()
@@ -154,10 +168,43 @@ def authorize_jira() -> dict:
         authorization_url,
     )
 
-    while OAuthCallbackHandler.auth_code is None and OAuthCallbackHandler.error is None:
-        pass  # Busy-wait; kept simple for CLI scenario
+    print("\n1️⃣ Copy this authorization URL if needed:\n")
+    print(authorization_url)
 
-    httpd.shutdown()
+    if _should_open_browser():
+        try:
+            webbrowser.open(authorization_url)
+            print("\n🔗 Opening browser for Jira login...")
+        except Exception:
+            print(
+                "\n⚠️ Unable to open browser automatically. Please open this URL manually:\n"
+            )
+            print(authorization_url)
+    else:
+        print(
+            "\n🌐 Automatic browser launch disabled by OAUTH_BROWSER_OPEN. Open the URL manually."
+        )
+
+    print(
+        "\nIf you encounter an Atlassian 'trouble logging in' message or are redirected to "
+        "home.atlassian.com, copy the URL you land on. If it contains '?code=XYZ', copy that "
+        "code and run:\n\npython -m modules.utils.oauth complete <auth_code>\n"
+    )
+
+    try:
+        while (
+            OAuthCallbackHandler.auth_code is None
+            and OAuthCallbackHandler.error is None
+        ):
+            time.sleep(0.2)
+    except KeyboardInterrupt:  # pragma: no cover - interactive flow
+        print(
+            "\nAuthorization flow interrupted. If you obtained an authorization code, run:\n"
+            "python -m modules.utils.oauth complete <auth_code>"
+        )
+        raise
+    finally:
+        httpd.shutdown()
 
     if OAuthCallbackHandler.error:
         raise RuntimeError(f"Authorization failed: {OAuthCallbackHandler.error}")
@@ -174,6 +221,41 @@ def authorize_jira() -> dict:
 
     save_token(token, config)
     return token
+
+
+def complete_authorization(auth_code: str) -> dict:
+    """Exchange a manually retrieved authorization code for tokens."""
+
+    config = load_config()
+    client_id = os.environ.get("JIRA_CLIENT_ID")
+    if not client_id:
+        raise RuntimeError("Environment variable JIRA_CLIENT_ID is required")
+
+    client_secret = os.environ.get("JIRA_SECRET", "")
+    token_url = config["jira"].get("token_url")
+    redirect_uri = config["jira"].get("redirect_uri")
+
+    verify_target = ssl_verify_path()
+    verify = str(verify_target) if verify_target else True
+
+    response = requests.post(
+        token_url,
+        json={
+            "grant_type": "authorization_code",
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "code": auth_code,
+            "redirect_uri": redirect_uri,
+        },
+        verify=verify,
+        timeout=30,
+    )
+    response.raise_for_status()
+    tokens = response.json()
+
+    token_path = save_token(tokens, config)
+    print(f"✅ Authorization successful. Tokens saved to {token_path}")
+    return tokens
 
 
 def get_jira_session() -> OAuth2Session:
@@ -278,15 +360,19 @@ def _refresh_token(
 
 
 if __name__ == "__main__":
-    import argparse
-
     parser = argparse.ArgumentParser(description="Jira OAuth utilities")
-    parser.add_argument(
-        "command",
-        choices=["authorize"],
-        help="Run the OAuth authorization flow",
-    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    args = parser.parse_args()
-    if args.command == "authorize":
-        authorize_jira()
+    authorize_parser = subparsers.add_parser(
+        "authorize", help="Run the OAuth authorization flow"
+    )
+    authorize_parser.set_defaults(func=lambda _: authorize_jira())
+
+    complete_parser = subparsers.add_parser(
+        "complete", help="Exchange an authorization code for tokens"
+    )
+    complete_parser.add_argument("auth_code", help="Authorization code from Jira")
+    complete_parser.set_defaults(func=lambda args: complete_authorization(args.auth_code))
+
+    cli_args = parser.parse_args()
+    cli_args.func(cli_args)
