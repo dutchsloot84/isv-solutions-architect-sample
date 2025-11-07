@@ -269,7 +269,9 @@ def test_authorize_jira_warns_when_refresh_token_missing(
             }
         },
     )
-    monkeypatch.setattr(oauth_utils, "_build_oauth_session", lambda config: dummy_session)
+    monkeypatch.setattr(
+        oauth_utils, "_build_oauth_session", lambda config: dummy_session
+    )
     monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
     monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
     monkeypatch.setattr(oauth_utils.webbrowser, "open", lambda *_: True)
