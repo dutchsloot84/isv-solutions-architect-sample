@@ -69,9 +69,24 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
         params = parse_qs(parsed.query)
         if "code" in params:
             OAuthCallbackHandler.auth_code = params["code"][0]
+            LOGGER.info(
+                "Authorization code captured from callback",
+                extra={
+                    "event": "oauth_authorize_callback_success",
+                    "slice_id": "07",
+                },
+            )
             response = "Authorization successful. You may close this window."
         else:
             OAuthCallbackHandler.error = params.get("error", ["unknown_error"])[0]
+            LOGGER.error(
+                "Authorization callback returned error",
+                extra={
+                    "event": "oauth_authorize_callback_error",
+                    "error": OAuthCallbackHandler.error,
+                    "slice_id": "07",
+                },
+            )
             response = "Authorization failed. Check the terminal for details."
 
         self.send_response(200)
@@ -145,13 +160,17 @@ def _should_open_browser() -> bool:
 def authorize_jira() -> dict:
     """Perform the initial Jira OAuth authorization flow and return the token."""
     config = load_config()
-    base_url = config["jira"].get("base_url")
     auth_url = config["jira"].get("auth_url")
+    audience = (
+        os.environ.get("JIRA_AUDIENCE")
+        or config["jira"].get("audience")
+        or "api.atlassian.com"
+    )
 
     session = _build_oauth_session(config)
     authorization_url, _ = session.authorization_url(
         auth_url,
-        audience=f"{base_url}/",
+        audience=audience,
         prompt="consent",
     )
 
@@ -164,8 +183,13 @@ def authorize_jira() -> dict:
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
 
     LOGGER.info(
-        "Open the following URL in a browser to authorize access: %s",
+        "Generated Jira authorization URL: %s",
         authorization_url,
+        extra={
+            "event": "oauth_authorize_url",
+            "url": authorization_url,
+            "slice_id": "07",
+        },
     )
 
     print("\n1️⃣ Copy this authorization URL if needed:\n")
@@ -207,17 +231,53 @@ def authorize_jira() -> dict:
         httpd.shutdown()
 
     if OAuthCallbackHandler.error:
+        LOGGER.error(
+            "Authorization failed during callback",
+            extra={
+                "event": "oauth_authorize_callback_error",
+                "error": OAuthCallbackHandler.error,
+                "slice_id": "07",
+            },
+        )
         raise RuntimeError(f"Authorization failed: {OAuthCallbackHandler.error}")
 
     LOGGER.info("Authorization code received; exchanging for access token")
     verify_target = ssl_verify_path()
-    token = session.fetch_token(
-        token_url=config["jira"].get("token_url"),
-        code=OAuthCallbackHandler.auth_code,
-        client_secret=os.environ.get("JIRA_SECRET"),
-        include_client_id=True,
-        verify=str(verify_target) if verify_target else True,
-    )
+    try:
+        token = session.fetch_token(
+            token_url=config["jira"].get("token_url"),
+            code=OAuthCallbackHandler.auth_code,
+            client_secret=os.environ.get("JIRA_SECRET"),
+            include_client_id=True,
+            verify=str(verify_target) if verify_target else True,
+        )
+    except Exception as error:  # noqa: BLE001 - propagate context for troubleshooting
+        response = getattr(error, "response", None)
+        if response is not None:
+            body = None
+            try:
+                body = response.text
+            except Exception:  # noqa: BLE001 - best-effort logging
+                body = "<unable to read body>"
+            LOGGER.error(
+                "OAuth token exchange failed",
+                extra={
+                    "event": "oauth_token_exchange_failure",
+                    "status_code": response.status_code,
+                    "response_body": body,
+                    "slice_id": "07",
+                },
+            )
+        else:
+            LOGGER.error(
+                "OAuth token exchange raised unexpected error",
+                extra={
+                    "event": "oauth_token_exchange_error",
+                    "error": type(error).__name__,
+                    "slice_id": "07",
+                },
+            )
+        raise
 
     save_token(token, config)
     return token
@@ -250,7 +310,24 @@ def complete_authorization(auth_code: str) -> dict:
         verify=verify,
         timeout=30,
     )
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as error:
+        body = None
+        try:
+            body = response.text
+        except Exception:  # noqa: BLE001 - best-effort logging
+            body = "<unable to read body>"
+        LOGGER.error(
+            "Manual token exchange failed",
+            extra={
+                "event": "oauth_manual_exchange_failure",
+                "status_code": response.status_code,
+                "response_body": body,
+                "slice_id": "07",
+            },
+        )
+        raise error
     tokens = response.json()
 
     token_path = save_token(tokens, config)
