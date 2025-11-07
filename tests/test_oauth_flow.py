@@ -19,8 +19,15 @@ class DummyOAuthSession:
         self.fetch_attempts = 0
         self.failures = failures or []
         self.fetch_history: List[Dict[str, Any]] = []
+        self.authorization_kwargs: Dict[str, Any] | None = None
+        self.scope: List[str] | None = None
+
+    def with_scopes(self, scopes: Optional[List[str]]) -> "DummyOAuthSession":
+        self.scope = list(scopes) if scopes is not None else None
+        return self
 
     def authorization_url(self, url: str, **kwargs: Any) -> tuple[str, str]:
+        self.authorization_kwargs = dict(kwargs)
         return url, "state-token"
 
     def fetch_token(self, *_, **kwargs: Any) -> Dict[str, Any]:
@@ -84,7 +91,7 @@ def test_token_exchange_success(
     monkeypatch.setattr(
         oauth_utils,
         "_build_oauth_session",
-        lambda config, token=None, scopes=None: dummy_session,
+        lambda config, token=None, scopes=None: dummy_session.with_scopes(scopes),
     )
     monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
     monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
@@ -126,6 +133,14 @@ def test_token_exchange_success(
     assert dummy_session.fetch_kwargs["verify"] is True
     assert dummy_session.fetch_kwargs["scope"] == ["read:me"]
     assert dummy_session.fetch_attempts == 2
+    assert dummy_session.authorization_kwargs is not None
+    assert "scope" not in dummy_session.authorization_kwargs
+
+    scope_logs = list((tmp_path / "logs").glob("oauth_scope_normalization_*.json"))
+    assert scope_logs, "Expected scope normalization log to be written"
+    scope_payload = json.loads(scope_logs[0].read_text())
+    assert scope_payload["normalized_scopes"] == ["read:me"]
+    assert scope_payload["requested_scopes"] == ["read:me"]
 
     assert oauth_utils.OAuthCallbackHandler.auth_code is None
     assert oauth_utils.OAuthCallbackHandler.error is None
