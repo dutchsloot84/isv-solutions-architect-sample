@@ -161,9 +161,7 @@ def save_token(token: dict, config: Optional[dict] = None) -> Path:
 def _load_token(config: dict) -> Optional[dict]:
     configured_path = config.get("jira", {}).get("token_path")
     token_path = (
-        resolve_path(configured_path)
-        if configured_path
-        else _default_token_path()
+        resolve_path(configured_path) if configured_path else _default_token_path()
     )
     if not token_path.exists():
         return None
@@ -185,6 +183,7 @@ def token_is_valid(token: dict) -> bool:
 
     buffer = timedelta(minutes=5)
     return datetime.now(timezone.utc) < (expiry - buffer)
+
 
 def _should_open_browser() -> bool:
     """Determine whether to launch the user's browser automatically."""
@@ -282,10 +281,7 @@ def authorize_jira() -> dict:
             and OAuthCallbackHandler.error is None
         ):
             time.sleep(0.2)
-            if (
-                not fallback_notified
-                and time.monotonic() - start_time > 30
-            ):
+            if not fallback_notified and time.monotonic() - start_time > 30:
                 fallback_notified = True
                 LOGGER.warning(
                     "⚠️ Did not receive an authorization callback automatically.",
@@ -298,9 +294,7 @@ def authorize_jira() -> dict:
                 print(
                     "If your browser did not redirect, copy the code from the URL and run:"
                 )
-                print(
-                    "python -m modules.utils.oauth complete <auth_code>"
-                )
+                print("python -m modules.utils.oauth complete <auth_code>")
     except KeyboardInterrupt:  # pragma: no cover - interactive flow
         print(
             "\nAuthorization flow interrupted. If you obtained an authorization code, run:\n"

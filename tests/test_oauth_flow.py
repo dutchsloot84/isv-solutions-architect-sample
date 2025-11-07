@@ -238,8 +238,7 @@ def test_authorize_jira_persists_token_and_logs_success(
     assert data["access_token"] == "abc"
     assert "refresh_token" in data
     assert any(
-        "✅ Access token successfully retrieved" in message
-        for message in info_messages
+        "✅ Access token successfully retrieved" in message for message in info_messages
     )
 
 
