@@ -14,7 +14,9 @@ def _response(status_code: int) -> Response:
     return resp
 
 
-def test_request_with_retry_recovers_from_ssl_error(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_request_with_retry_recovers_from_ssl_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     attempts: list[int] = []
 
     class DummySession:
@@ -26,13 +28,17 @@ def test_request_with_retry_recovers_from_ssl_error(monkeypatch: pytest.MonkeyPa
 
     monkeypatch.setattr(http_retry, "_sleep", lambda _: None)
 
-    response = http_retry.request_with_retry(DummySession(), "GET", "https://example.com", verify=True)
+    response = http_retry.request_with_retry(
+        DummySession(), "GET", "https://example.com", verify=True
+    )
 
     assert response.status_code == 200
     assert len(attempts) == 2
 
 
-def test_request_with_retry_retries_on_status_code(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_request_with_retry_retries_on_status_code(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     attempts: list[int] = []
 
     class DummySession:
@@ -44,13 +50,17 @@ def test_request_with_retry_retries_on_status_code(monkeypatch: pytest.MonkeyPat
 
     monkeypatch.setattr(http_retry, "_sleep", lambda _: None)
 
-    response = http_retry.request_with_retry(DummySession(), "GET", "https://example.com", verify=True)
+    response = http_retry.request_with_retry(
+        DummySession(), "GET", "https://example.com", verify=True
+    )
 
     assert response.status_code == 200
     assert len(attempts) == 2
 
 
-def test_request_with_retry_raises_after_exhausting_retries(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_request_with_retry_raises_after_exhausting_retries(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     class DummySession:
         def request(self, method: str, url: str, **kwargs):
             raise ConnectionError("network down")

@@ -1,9 +1,9 @@
-"""Tests for the Slice 05 CLI orchestrator."""
+"""Tests for the Slice 09 Guard Phase CLI orchestrator."""
 
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -41,7 +41,9 @@ def test_analyze_creates_usage_artifact_and_progress(orchestrator_env):
     content = usage_path.read_text(encoding="utf-8")
     assert "CLI Orchestrator Usage" in content
 
-    progress_data = helpers.read_json(orchestrator._progress_path)  # noqa: SLF001 - test scope
+    progress_data = helpers.read_json(
+        orchestrator._progress_path
+    )  # noqa: SLF001 - test scope
     stages = [event["stage"] for event in progress_data["events"]]
     assert "analyze" in stages
 
@@ -61,7 +63,7 @@ def test_execute_records_progress_and_release_notes(tmp_path, orchestrator_env):
         report.write_text("# report", encoding="utf-8")
         return report
 
-    version_manager = VersionManager(artifact_root=helpers.artifact_path("05"))
+    version_manager = VersionManager(artifact_root=helpers.artifact_path("09"))
     orchestrator = Orchestrator(
         fix_version="1.2.3",
         env=orchestrator_env,
@@ -75,7 +77,9 @@ def test_execute_records_progress_and_release_notes(tmp_path, orchestrator_env):
     assert plan.version == "0.0.1"
     assert plan.notes_path.exists()
 
-    progress_data = helpers.read_json(orchestrator._progress_path)  # noqa: SLF001 - test scope
+    progress_data = helpers.read_json(
+        orchestrator._progress_path
+    )  # noqa: SLF001 - test scope
     stages = [event["stage"] for event in progress_data["events"]]
     assert stages[0] == "execute:start"
     assert "execute:complete" in stages
@@ -87,7 +91,7 @@ def test_release_notes_mask_secrets(monkeypatch, tmp_path):
     monkeypatch.setenv("JIRA_SECRET", "super-secret")
     monkeypatch.setenv("SSL_CERT_PATH", "/tmp/cert.pem")
 
-    manager = VersionManager(artifact_root=helpers.artifact_path("05"))
+    manager = VersionManager(artifact_root=helpers.artifact_path("09"))
     plan = manager.plan_release(
         release_type="minor",
         current_tag="1.2.3",
@@ -101,6 +105,7 @@ def test_release_notes_mask_secrets(monkeypatch, tmp_path):
     assert "super-secret" not in notes
     assert "***" in notes
     assert plan.notes_path.name == "version_tag_notes_20240101T010101Z.md"
+
 
 def test_analyze_requires_core_environment(tmp_path, monkeypatch):
     monkeypatch.setenv("ARTIFACT_ROOT", str(tmp_path / "artifacts"))

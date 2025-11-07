@@ -28,7 +28,6 @@ except ImportError:
 from .utils import helpers
 from .utils.logger import get_logger
 
-
 LOGGER = get_logger(__name__)
 
 
@@ -110,16 +109,12 @@ def generate_delta() -> Tuple[Path, Dict[str, List[Dict]]]:
     latest_files = helpers.latest_snapshot_files(snapshot_dir, limit=2)
 
     if not latest_files:
-        raise FileNotFoundError(
-            "No snapshot files found. Run the snapshot step first."
-        )
+        raise FileNotFoundError("No snapshot files found. Run the snapshot step first.")
 
     current_path = latest_files[0]
     current_data = helpers.read_json(current_path)
     previous_data = (
-        helpers.read_json(latest_files[1])
-        if len(latest_files) > 1
-        else {"issues": []}
+        helpers.read_json(latest_files[1]) if len(latest_files) > 1 else {"issues": []}
     )
 
     current_index = _index_issues(current_data.get("issues", []))
@@ -131,9 +126,7 @@ def generate_delta() -> Tuple[Path, Dict[str, List[Dict]]]:
     delta = {
         "fixVersion": current_data.get("fixVersion"),
         "current_snapshot": current_path.name,
-        "previous_snapshot": latest_files[1].name
-        if len(latest_files) > 1
-        else None,
+        "previous_snapshot": latest_files[1].name if len(latest_files) > 1 else None,
         "counts": {key: len(value) for key, value in categories.items()},
         "items": categories,
     }

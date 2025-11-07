@@ -17,13 +17,17 @@ class _DummyResponse:
     def json(self) -> Dict[str, Any]:
         return self._payload
 
-    def raise_for_status(self) -> None:  # pragma: no cover - status_code controls behaviour
+    def raise_for_status(
+        self,
+    ) -> None:  # pragma: no cover - status_code controls behaviour
         if self.status_code >= 400:
             raise RuntimeError(f"HTTP error {self.status_code}")
 
 
 @pytest.fixture()
-def snapshot_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, str]:
+def snapshot_environment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> dict[str, str]:
     artifact_root = tmp_path / "artifacts"
     monkeypatch.setenv("ARTIFACT_ROOT", str(artifact_root))
     monkeypatch.setenv("SSL_CERT_PATH", str(tmp_path / "corp.pem"))
@@ -44,12 +48,16 @@ def snapshot_environment(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dic
         "reporting": {"timezone": "UTC"},
     }
     monkeypatch.setattr(snapshot.helpers, "load_config", lambda: config)
-    monkeypatch.setattr(snapshot.helpers, "timestamp_for_filename", lambda tz=None: "20240101T000000Z")
+    monkeypatch.setattr(
+        snapshot.helpers, "timestamp_for_filename", lambda tz=None: "20240101T000000Z"
+    )
 
     return {"ARTIFACT_ROOT": str(artifact_root)}
 
 
-def test_fetch_jql_results_persists_snapshot(snapshot_environment: dict[str, str], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_fetch_jql_results_persists_snapshot(
+    snapshot_environment: dict[str, str], monkeypatch: pytest.MonkeyPatch
+) -> None:
     payload = {
         "issues": [
             {
@@ -64,22 +72,29 @@ def test_fetch_jql_results_persists_snapshot(snapshot_environment: dict[str, str
         ]
     }
     monkeypatch.setattr(snapshot, "get_jira_session", lambda: object())
-    monkeypatch.setattr(snapshot, "request_with_retry", lambda *a, **k: _DummyResponse(payload))
+    monkeypatch.setattr(
+        snapshot, "request_with_retry", lambda *a, **k: _DummyResponse(payload)
+    )
 
     issues = snapshot.fetch_jql_results("1.0.0")
 
     assert len(issues) == 1
     assert issues[0]["key"] == "ABC-1"
 
-    snapshot_path = snapshot.helpers.artifact_path("snapshots", "snapshot_20240101T000000Z.json")
+    snapshot_path = snapshot.helpers.artifact_path(
+        "snapshots", "snapshot_20240101T000000Z.json"
+    )
     assert snapshot_path.exists()
     written = json.loads(snapshot_path.read_text(encoding="utf-8"))
     assert written["fixVersion"] == "1.0.0"
     assert written["issues"][0]["deployment_notes"] == "Notes"
 
 
-def test_fetch_jql_results_uses_mock_data_on_failure(snapshot_environment: dict[str, str], monkeypatch: pytest.MonkeyPatch) -> None:
+def test_fetch_jql_results_uses_mock_data_on_failure(
+    snapshot_environment: dict[str, str], monkeypatch: pytest.MonkeyPatch
+) -> None:
     monkeypatch.setattr(snapshot, "get_jira_session", lambda: object())
+
     def failing_request(*_: object, **__: object) -> None:
         raise RuntimeError("boom")
 
@@ -90,5 +105,7 @@ def test_fetch_jql_results_uses_mock_data_on_failure(snapshot_environment: dict[
     assert issues  # falls back to bundled mock payload
     assert all(issue["fixVersions"] == ["9.9.9"] for issue in issues)
 
-    snapshot_path = snapshot.helpers.artifact_path("snapshots", "snapshot_20240101T000000Z.json")
+    snapshot_path = snapshot.helpers.artifact_path(
+        "snapshots", "snapshot_20240101T000000Z.json"
+    )
     assert snapshot_path.exists()

@@ -5,12 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List
 
+from src.validation import filter_valid_issues
+
 from .utils import helpers
 from .utils.http_retry import request_with_retry
 from .utils.logger import get_logger
 from .utils.oauth import get_jira_session
-from src.validation import filter_valid_issues
-
 
 LOGGER = get_logger(__name__)
 
@@ -73,9 +73,7 @@ def fetch_jql_results(fix_version: str) -> List[Dict]:
             len(issues),
             fix_version,
         )
-    except (
-        Exception
-    ) as error:  # noqa: BLE001 - we want to provide friendly fallback
+    except Exception as error:  # noqa: BLE001 - we want to provide friendly fallback
         LOGGER.warning("Falling back to mock data due to API error: %s", error)
         issues = filter_valid_issues(
             [

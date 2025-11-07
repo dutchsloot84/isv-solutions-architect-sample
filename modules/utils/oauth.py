@@ -45,7 +45,6 @@ except ImportError:
 from .helpers import load_config, resolve_path, ssl_verify_path
 from .logger import get_logger
 
-
 LOGGER = get_logger(__name__)
 
 
@@ -65,9 +64,7 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
             OAuthCallbackHandler.auth_code = params["code"][0]
             response = "Authorization successful. You may close this window."
         else:
-            OAuthCallbackHandler.error = params.get(
-                "error", ["unknown_error"]
-            )[0]
+            OAuthCallbackHandler.error = params.get("error", ["unknown_error"])[0]
             response = "Authorization failed. Check the terminal for details."
 
         self.send_response(200)
@@ -82,9 +79,7 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
         return
 
 
-def _build_oauth_session(
-    config: dict, token: Optional[dict] = None
-) -> OAuth2Session:
+def _build_oauth_session(config: dict, token: Optional[dict] = None) -> OAuth2Session:
     """Create an OAuth2Session configured for Jira."""
     client_id = os.environ.get("JIRA_CLIENT_ID")
     if not client_id:
@@ -114,9 +109,7 @@ def _build_oauth_session(
 def save_token(token: dict, config: Optional[dict] = None) -> Path:
     """Persist the OAuth token to disk."""
     cfg = config or load_config()
-    token_path = resolve_path(
-        cfg["jira"].get("token_path", "~/.jira_token.json")
-    )
+    token_path = resolve_path(cfg["jira"].get("token_path", "~/.jira_token.json"))
     token_path.parent.mkdir(parents=True, exist_ok=True)
     with token_path.open("w", encoding="utf-8") as handle:
         json.dump(token, handle)
@@ -125,9 +118,7 @@ def save_token(token: dict, config: Optional[dict] = None) -> Path:
 
 
 def _load_token(config: dict) -> Optional[dict]:
-    token_path = resolve_path(
-        config["jira"].get("token_path", "~/.jira_token.json")
-    )
+    token_path = resolve_path(config["jira"].get("token_path", "~/.jira_token.json"))
     if not token_path.exists():
         return None
     with token_path.open("r", encoding="utf-8") as handle:
@@ -160,18 +151,13 @@ def authorize_jira() -> dict:
         authorization_url,
     )
 
-    while (
-        OAuthCallbackHandler.auth_code is None
-        and OAuthCallbackHandler.error is None
-    ):
+    while OAuthCallbackHandler.auth_code is None and OAuthCallbackHandler.error is None:
         pass  # Busy-wait; kept simple for CLI scenario
 
     httpd.shutdown()
 
     if OAuthCallbackHandler.error:
-        raise RuntimeError(
-            f"Authorization failed: {OAuthCallbackHandler.error}"
-        )
+        raise RuntimeError(f"Authorization failed: {OAuthCallbackHandler.error}")
 
     LOGGER.info("Authorization code received; exchanging for access token")
     verify_target = ssl_verify_path()
@@ -193,9 +179,7 @@ def get_jira_session() -> OAuth2Session:
     token = _load_token(config)
 
     if not token:
-        raise RuntimeError(
-            "No OAuth token found. Run the authorize_jira flow first."
-        )
+        raise RuntimeError("No OAuth token found. Run the authorize_jira flow first.")
 
     session = _build_oauth_session(config, token=token)
 

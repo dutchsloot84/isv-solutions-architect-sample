@@ -53,7 +53,9 @@ def snapshot_payloads() -> tuple[Dict[str, Any], Dict[str, Any]]:
     return current, previous
 
 
-def test_analyze_snapshots_detects_changes(snapshot_payloads: tuple[Dict[str, Any], Dict[str, Any]]) -> None:
+def test_analyze_snapshots_detects_changes(
+    snapshot_payloads: tuple[Dict[str, Any], Dict[str, Any]]
+) -> None:
     current, previous = snapshot_payloads
     result = analyzer.analyze_snapshots(
         current,
@@ -86,7 +88,9 @@ def test_analyze_snapshots_detects_changes(snapshot_payloads: tuple[Dict[str, An
     assert metadata["previous_snapshot"] == "snapshot_202407.json"
 
 
-def test_format_markdown_report_includes_sections(snapshot_payloads: tuple[Dict[str, Any], Dict[str, Any]]) -> None:
+def test_format_markdown_report_includes_sections(
+    snapshot_payloads: tuple[Dict[str, Any], Dict[str, Any]]
+) -> None:
     delta = analyzer.analyze_snapshots(*snapshot_payloads)
     markdown = analyzer.format_markdown_report(delta)
 

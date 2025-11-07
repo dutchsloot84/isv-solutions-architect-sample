@@ -4,7 +4,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Tuple,
+)
 
 from modules.utils import helpers
 from modules.utils.logger import get_logger
@@ -136,9 +146,7 @@ def _collect_checklist_items(
                 best_category_rank = existing_category_rank
             best_status_rank = min(existing.status_rank, status_rank)
             status_text = (
-                normalized_status
-                if normalized_status != "Unknown"
-                else existing.status
+                normalized_status if normalized_status != "Unknown" else existing.status
             )
             collected[identifier] = ChecklistItem(
                 key=identifier,
@@ -175,7 +183,9 @@ def _collect_checklist_items(
     for issue in changed:
         changes = issue.get("changes", {})
         status_change = changes.get("status")
-        status = _normalize_status((status_change or {}).get("current") or issue.get("status"))
+        status = _normalize_status(
+            (status_change or {}).get("current") or issue.get("status")
+        )
         notes: List[str] = []
         for field, payload in sorted(changes.items()):
             previous = payload.get("previous")
@@ -210,7 +220,9 @@ def _extract_summary(delta: Mapping[str, Any]) -> Dict[str, Any]:
     counts = delta.get("counts")
     if isinstance(counts, Mapping):
         return {
-            "total_current": counts.get("total", sum(counts.values())) if "total" in counts else None,
+            "total_current": (
+                counts.get("total", sum(counts.values())) if "total" in counts else None
+            ),
             "field_deltas": delta.get("field_deltas") or {},
             "counts": dict(counts),
         }
@@ -280,21 +292,27 @@ def aggregate_readiness(
     score, score_label = _compute_readiness_score(open_items, total_current)
 
     metadata = delta.get("metadata") or {}
-    fix_version = metadata.get("current_fix_version") or metadata.get("previous_fix_version")
+    fix_version = metadata.get("current_fix_version") or metadata.get(
+        "previous_fix_version"
+    )
     if not fix_version:
         fix_version = delta.get("fixVersion")
 
     aggregated = {
         "metadata": {
             "fix_version": fix_version,
-            "current_snapshot": metadata.get("current_snapshot") or delta.get("current_snapshot"),
-            "previous_snapshot": metadata.get("previous_snapshot") or delta.get("previous_snapshot"),
+            "current_snapshot": metadata.get("current_snapshot")
+            or delta.get("current_snapshot"),
+            "previous_snapshot": metadata.get("previous_snapshot")
+            or delta.get("previous_snapshot"),
             "generated_at": helpers.current_timestamp(timezone).isoformat(),
             "timezone": timezone,
         },
         "summary": {
             "totals": totals,
-            "field_changes": summary.get("field_deltas") or summary.get("field_changes") or {},
+            "field_changes": summary.get("field_deltas")
+            or summary.get("field_changes")
+            or {},
         },
         "readiness": {
             "score": score,
@@ -331,8 +349,12 @@ def format_markdown(aggregated: Mapping[str, Any]) -> str:
     lines.append("")
     lines.append("| Field | Value |")
     lines.append("| --- | --- |")
-    lines.append(f"| Current Snapshot | `{metadata.get('current_snapshot') or 'n/a'}` |")
-    lines.append(f"| Previous Snapshot | `{metadata.get('previous_snapshot') or 'n/a'}` |")
+    lines.append(
+        f"| Current Snapshot | `{metadata.get('current_snapshot') or 'n/a'}` |"
+    )
+    lines.append(
+        f"| Previous Snapshot | `{metadata.get('previous_snapshot') or 'n/a'}` |"
+    )
     lines.append(f"| Generated At | {metadata.get('generated_at', 'Unknown')} |")
     lines.append(f"| Readiness Score | {score}/100 ({label}) |")
     lines.append("")

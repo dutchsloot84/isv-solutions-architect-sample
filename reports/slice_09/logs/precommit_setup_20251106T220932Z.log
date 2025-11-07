@@ -1,0 +1,20 @@
+ruff.....................................................................[42mPassed[m
+black....................................................................[42mPassed[m
+mypy.....................................................................[41mFailed[m
+[2m- hook id: mypy[m
+[2m- exit code: 1[m
+
+modules/config/loader.py:29: [1m[31merror:(B[m Incompatible types in assignment (expression has type (B[m[1m"_SimpleYAML"(B[m, variable has type Module)  (B[m[33m[assignment](B[m
+modules/utils/oauth.py:19: [1m[31merror:(B[m Name (B[m[1m"OAuth2Session"(B[m already defined (possibly by an import)  (B[m[33m[no-redef](B[m
+modules/utils/oauth.py:19: [34mnote:(B[m Error code (B[m[1m"no-redef"(B[m not covered by (B[m[1m"type: ignore"(B[m comment(B[m
+modules/readiness/reporter.py:327: [1m[31merror:(B[m Unsupported target for indexed assignment ((B[m[1m"Collection[Collection[str]]"(B[m)  (B[m[33m[index](B[m
+modules/readiness/reporter.py:328: [1m[31merror:(B[m Unsupported target for indexed assignment ((B[m[1m"Collection[Collection[str]]"(B[m)  (B[m[33m[index](B[m
+modules/readiness/reporter.py:329: [1m[31merror:(B[m Unsupported target for indexed assignment ((B[m[1m"Collection[Collection[str]]"(B[m)  (B[m[33m[index](B[m
+modules/compare.py:13: [1m[31merror:(B[m Name (B[m[1m"DeepDiff"(B[m already defined (possibly by an import)  (B[m[33m[no-redef](B[m
+modules/compare.py:13: [34mnote:(B[m Error code (B[m[1m"no-redef"(B[m not covered by (B[m[1m"type: ignore"(B[m comment(B[m
+modules/orchestrator/cli.py:164: [1m[31merror:(B[m Item (B[m[1m"None"(B[m of (B[m[1m"Mapping[str, str] | None"(B[m has no attribute (B[m[1m"get"(B[m  (B[m[33m[union-attr](B[m
+modules/orchestrator/cli.py:169: [1m[31merror:(B[m Item (B[m[1m"None"(B[m of (B[m[1m"Mapping[str, str] | None"(B[m has no attribute (B[m[1m"get"(B[m  (B[m[33m[union-attr](B[m
+[1m[31mFound 8 errors in 5 files (checked 22 source files)(B[m
+
+bandit...................................................................[42mPassed[m
+pytest...................................................................[42mPassed[m

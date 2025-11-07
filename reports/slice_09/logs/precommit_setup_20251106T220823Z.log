@@ -1,0 +1,135 @@
+ruff.....................................................................[41mFailed[m
+[2m- hook id: ruff[m
+[2m- exit code: 1[m
+[2m- files were modified by this hook[m
+
+[1mscripts/add_to_project.py[0m[36m:[0m59[36m:[0m1[36m:[0m SyntaxError: Unexpected indentation
+[1;38;5;12m   |[0m
+[1;38;5;12m57 |[0m     try:
+[1;38;5;12m58 |[0m         logging.debug("Fetching existing project items with command: %s", " ".join(cmd))
+[1;38;5;12m59 |[0m             result = subprocess.run(  # nosec B603 - command list is static and validated
+[1;38;5;12m   |[0m[1;38;5;9m ^[0m
+[1;38;5;12m60 |[0m                 cmd,
+[1;38;5;12m61 |[0m                 check=True,
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m65[36m:[0m5[36m:[0m SyntaxError: Expected `except` or `finally` after `try` block
+[1;38;5;12m   |[0m
+[1;38;5;12m63 |[0m                 text=True,
+[1;38;5;12m64 |[0m         )
+[1;38;5;12m65 |[0m     except FileNotFoundError as exc:
+[1;38;5;12m   |[0m[1;38;5;9m     ^[0m
+[1;38;5;12m66 |[0m         logging.warning("gh CLI not found: %s", exc)
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m65[36m:[0m30[36m:[0m SyntaxError: Expected a statement
+[1;38;5;12m   |[0m
+[1;38;5;12m63 |[0m                 text=True,
+[1;38;5;12m64 |[0m         )
+[1;38;5;12m65 |[0m     except FileNotFoundError as exc:
+[1;38;5;12m   |[0m[1;38;5;9m                              ^[0m
+[1;38;5;12m66 |[0m         logging.warning("gh CLI not found: %s", exc)
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m65[36m:[0m37[36m:[0m SyntaxError: Expected an expression
+[1;38;5;12m   |[0m
+[1;38;5;12m63 |[0m                 text=True,
+[1;38;5;12m64 |[0m         )
+[1;38;5;12m65 |[0m     except FileNotFoundError as exc:
+[1;38;5;12m   |[0m[1;38;5;9m                                     ^[0m
+[1;38;5;12m66 |[0m         logging.warning("gh CLI not found: %s", exc)
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m68 |[0m     except subprocess.CalledProcessError as exc:
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m66[36m:[0m1[36m:[0m SyntaxError: Unexpected indentation
+[1;38;5;12m   |[0m
+[1;38;5;12m64 |[0m         )
+[1;38;5;12m65 |[0m     except FileNotFoundError as exc:
+[1;38;5;12m66 |[0m         logging.warning("gh CLI not found: %s", exc)
+[1;38;5;12m   |[0m[1;38;5;9m ^[0m
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m68 |[0m     except subprocess.CalledProcessError as exc:
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m68[36m:[0m5[36m:[0m SyntaxError: Expected a statement
+[1;38;5;12m   |[0m
+[1;38;5;12m66 |[0m         logging.warning("gh CLI not found: %s", exc)
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m68 |[0m     except subprocess.CalledProcessError as exc:
+[1;38;5;12m   |[0m[1;38;5;9m     ^[0m
+[1;38;5;12m69 |[0m         logging.warning(
+[1;38;5;12m70 |[0m             "Unable to list existing project items (return code %s): %s",
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m68[36m:[0m42[36m:[0m SyntaxError: Expected a statement
+[1;38;5;12m   |[0m
+[1;38;5;12m66 |[0m         logging.warning("gh CLI not found: %s", exc)
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m68 |[0m     except subprocess.CalledProcessError as exc:
+[1;38;5;12m   |[0m[1;38;5;9m                                          ^[0m
+[1;38;5;12m69 |[0m         logging.warning(
+[1;38;5;12m70 |[0m             "Unable to list existing project items (return code %s): %s",
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m68[36m:[0m49[36m:[0m SyntaxError: Expected an expression
+[1;38;5;12m   |[0m
+[1;38;5;12m66 |[0m         logging.warning("gh CLI not found: %s", exc)
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m68 |[0m     except subprocess.CalledProcessError as exc:
+[1;38;5;12m   |[0m[1;38;5;9m                                                 ^[0m
+[1;38;5;12m69 |[0m         logging.warning(
+[1;38;5;12m70 |[0m             "Unable to list existing project items (return code %s): %s",
+[1;38;5;12m71 |[0m             exc.returncode,
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m69[36m:[0m1[36m:[0m SyntaxError: Unexpected indentation
+[1;38;5;12m   |[0m
+[1;38;5;12m67 |[0m         return set()
+[1;38;5;12m68 |[0m     except subprocess.CalledProcessError as exc:
+[1;38;5;12m69 |[0m         logging.warning(
+[1;38;5;12m   |[0m[1;38;5;9m ^[0m
+[1;38;5;12m70 |[0m             "Unable to list existing project items (return code %s): %s",
+[1;38;5;12m71 |[0m             exc.returncode,
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m76[36m:[0m5[36m:[0m SyntaxError: Expected a statement
+[1;38;5;12m   |[0m
+[1;38;5;12m74 |[0m         return set()
+[1;38;5;12m75 |[0m 
+[1;38;5;12m76 |[0m     try:
+[1;38;5;12m   |[0m[1;38;5;9m     ^[0m
+[1;38;5;12m77 |[0m         data = json.loads(result.stdout or "[]")
+[1;38;5;12m78 |[0m     except json.JSONDecodeError as exc:
+[1;38;5;12m   |[0m
+
+[1mscripts/add_to_project.py[0m[36m:[0m90[36m:[0m1[36m:[0m SyntaxError: Expected a statement
+[1;38;5;12m   |[0m
+[1;38;5;12m90 |[0m def build_body(branch: str, labels: List[str]) -> str:
+[1;38;5;12m   |[0m[1;38;5;9m ^[0m
+[1;38;5;12m91 |[0m     lines = [
+[1;38;5;12m92 |[0m         "Phase: Build",
+[1;38;5;12m   |[0m
+
+Found 12 errors (1 fixed, 11 remaining).
+
+black....................................................................[41mFailed[m
+[2m- hook id: black[m
+[2m- exit code: 123[m
+
+[31merror: cannot format scripts/add_to_project.py: Cannot parse: 59:0:             result = subprocess.run(  # nosec B603 - command list is static and validated[0m
+
+[1mOh no! 💥 💔 💥[0m
+[34m34 files [0mleft unchanged, [31m1 file failed to reformat[0m.
+
+mypy.....................................................................[41mFailed[m
+[2m- hook id: mypy[m
+[2m- exit code: 2[m
+
+scripts/add_to_project.py:59: [1m[31merror:(B[m unexpected indent  (B[m[33m[syntax](B[m
+[1m[31mFound 1 error in 1 file (errors prevented further checking)(B[m
+
+bandit...................................................................[42mPassed[m
+pytest...................................................................[42mPassed[m

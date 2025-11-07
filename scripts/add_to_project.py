@@ -6,7 +6,7 @@ import argparse
 import datetime as _dt
 import json
 import logging
-import subprocess
+import subprocess  # nosec B404 - subprocess is required for GitHub CLI integration
 import sys
 from pathlib import Path
 from typing import Iterable, List, Set
@@ -56,7 +56,7 @@ def fetch_existing_titles(owner: str, project_number: int) -> Set[str]:
     ]
     try:
         logging.debug("Fetching existing project items with command: %s", " ".join(cmd))
-        result = subprocess.run(
+        result = subprocess.run(  # nosec B603 - command list is static and validated
             cmd,
             check=True,
             capture_output=True,
@@ -66,7 +66,11 @@ def fetch_existing_titles(owner: str, project_number: int) -> Set[str]:
         logging.warning("gh CLI not found: %s", exc)
         return set()
     except subprocess.CalledProcessError as exc:
-        logging.warning("Unable to list existing project items (return code %s): %s", exc.returncode, exc.stderr.strip())
+        logging.warning(
+            "Unable to list existing project items (return code %s): %s",
+            exc.returncode,
+            exc.stderr.strip(),
+        )
         return set()
 
     try:
@@ -94,7 +98,13 @@ def build_body(branch: str, labels: List[str]) -> str:
     return "\n".join(lines)
 
 
-def add_slice(owner: str, project_number: int, slice_path: Path, labels: List[str], existing_titles: Set[str]) -> str:
+def add_slice(
+    owner: str,
+    project_number: int,
+    slice_path: Path,
+    labels: List[str],
+    existing_titles: Set[str],
+) -> str:
     with slice_path.open("r", encoding="utf-8") as fh:
         data = yaml.safe_load(fh) or {}
 
@@ -124,7 +134,9 @@ def add_slice(owner: str, project_number: int, slice_path: Path, labels: List[st
 
     logging.debug("Running command: %s", " ".join(cmd))
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(
+            cmd, check=True
+        )  # nosec B603 - command list is static and validated
         message = f"✅ Added {project_title}"
         existing_titles.add(project_title)
         logging.info(message)
@@ -153,8 +165,9 @@ def discover_slice_files(selection: List[str] | None) -> List[Path]:
         if not clean:
             continue
         slice_id = clean.zfill(2)
-        pattern = f"slice_{slice_id}_*.yml"
-        matches = [path for path in all_paths if path.name.startswith(f"slice_{slice_id}_")]
+        matches = [
+            path for path in all_paths if path.name.startswith(f"slice_{slice_id}_")
+        ]
         if matches:
             resolved.extend(matches)
         else:
@@ -177,7 +190,10 @@ def configure_logging() -> Path:
     timestamp = _dt.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     log_path = LOG_DIR / f"add_to_project_{timestamp}.log"
 
-    handlers = [logging.StreamHandler(sys.stdout), logging.FileHandler(log_path, mode="a", encoding="utf-8")]
+    handlers = [
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(log_path, mode="a", encoding="utf-8"),
+    ]
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
@@ -188,10 +204,19 @@ def configure_logging() -> Path:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Add slice definitions to GitHub Project board")
+    parser = argparse.ArgumentParser(
+        description="Add slice definitions to GitHub Project board"
+    )
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("--all", action="store_true", help="Process all slice definitions (default)")
-    group.add_argument("--slice", action="append", dest="slices", help="Process a specific slice id (e.g., 03). Can be repeated.")
+    group.add_argument(
+        "--all", action="store_true", help="Process all slice definitions (default)"
+    )
+    group.add_argument(
+        "--slice",
+        action="append",
+        dest="slices",
+        help="Process a specific slice id (e.g., 03). Can be repeated.",
+    )
     return parser.parse_args()
 
 
@@ -208,7 +233,9 @@ def main() -> int:
     labels = resolve_labels(config.get("default_labels", []))
 
     args = parse_args()
-    slice_paths = discover_slice_files(args.slices if getattr(args, "slices", None) else None)
+    slice_paths = discover_slice_files(
+        args.slices if getattr(args, "slices", None) else None
+    )
     if not slice_paths:
         logging.warning("No slice files found to process.")
         print("⚠️ No slices processed.")

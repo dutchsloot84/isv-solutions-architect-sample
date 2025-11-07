@@ -1,0 +1,1251 @@
+ruff.....................................................................[41mFailed[m
+[2m- hook id: ruff[m
+[2m- exit code: 1[m
+
+[1mmain.py[0m[36m:[0m99[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (106 > 88)
+[1;38;5;12m    |[0m
+[1;38;5;12m 97 |[0m     if not fix_version:
+[1;38;5;12m 98 |[0m         raise SystemExit(
+[1;38;5;12m 99 |[0m             "A fix version is required. Provide --fixVersion or set the FIX_VERSION environment variable."
+[1;38;5;12m    |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m100 |[0m         )
+[1;38;5;12m101 |[0m     run(fix_version, force_update=args.update)
+[1;38;5;12m    |[0m
+
+[1mmodules/orchestrator/cli.py[0m[36m:[0m70[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (121 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m68 |[0m             f"- **Phase:** {self.phase}",
+[1;38;5;12m69 |[0m             "- **Commands:** `analyze`, `execute`, `validate`.",
+[1;38;5;12m70 |[0m             "- **Required env vars:** `JIRA_CLIENT_ID`, `JIRA_SECRET`, `SSL_CERT_PATH`, `ARTIFACT_ROOT`, `FIX_VERSION`.",
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m71 |[0m             "- **Masking:** Secrets logged via the JSON logger are replaced with `***`.",
+[1;38;5;12m72 |[0m             "- **Artifacts:** progress JSON, usage notes, readiness report, release notes, pre-commit logs.",
+[1;38;5;12m   |[0m
+
+[1mmodules/orchestrator/cli.py[0m[36m:[0m71[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (89 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m69 |[0m             "- **Commands:** `analyze`, `execute`, `validate`.",
+[1;38;5;12m70 |[0m             "- **Required env vars:** `JIRA_CLIENT_ID`, `JIRA_SECRET`, `SSL_CERT_PATH`, `ARTIFACT_ROOT`, `FIX_VERSION`.",
+[1;38;5;12m71 |[0m             "- **Masking:** Secrets logged via the JSON logger are replaced with `***`.",
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^[0m [1;38;5;9mE501[0m
+[1;38;5;12m72 |[0m             "- **Artifacts:** progress JSON, usage notes, readiness report, release notes, pre-commit logs.",
+[1;38;5;12m73 |[0m             "",
+[1;38;5;12m   |[0m
+
+[1mmodules/orchestrator/cli.py[0m[36m:[0m72[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (109 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m70 |[0m             "- **Required env vars:** `JIRA_CLIENT_ID`, `JIRA_SECRET`, `SSL_CERT_PATH`, `ARTIFACT_ROOT`, `FIX_VERSION`.",
+[1;38;5;12m71 |[0m             "- **Masking:** Secrets logged via the JSON logger are replaced with `***`.",
+[1;38;5;12m72 |[0m             "- **Artifacts:** progress JSON, usage notes, readiness report, release notes, pre-commit logs.",
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m73 |[0m             "",
+[1;38;5;12m74 |[0m             "## Notes",
+[1;38;5;12m   |[0m
+
+[1mmodules/orchestrator/cli.py[0m[36m:[0m77[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (125 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m75 |[0m             "- Ensure analyzers from Slices 01-04 are installed in the environment.",
+[1;38;5;12m76 |[0m             "- Provide a writable `${ARTIFACT_ROOT}` for logs and reports.",
+[1;38;5;12m77 |[0m             "- Review Slice 08 validation outputs in `${ARTIFACT_ROOT}/validation/08/` and related reports for regressions.",
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m78 |[0m             "- Reference `${ARTIFACT_ROOT}/reports/slice_08_<timestamp>.md` and `/reports/weekly_summary_<latest>.md` for context.",
+[1;38;5;12m79 |[0m             "- Capture blockers or dependency gaps below.",
+[1;38;5;12m   |[0m
+
+[1mmodules/orchestrator/cli.py[0m[36m:[0m78[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (132 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m76 |[0m             "- Provide a writable `${ARTIFACT_ROOT}` for logs and reports.",
+[1;38;5;12m77 |[0m             "- Review Slice 08 validation outputs in `${ARTIFACT_ROOT}/validation/08/` and related reports for regressions.",
+[1;38;5;12m78 |[0m             "- Reference `${ARTIFACT_ROOT}/reports/slice_08_<timestamp>.md` and `/reports/weekly_summary_<latest>.md` for context.",
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m79 |[0m             "- Capture blockers or dependency gaps below.",
+[1;38;5;12m80 |[0m             "- Guard Phase requires `.pre-commit-config.yaml` and hook activation notes to remain current.",
+[1;38;5;12m   |[0m
+
+[1mmodules/orchestrator/cli.py[0m[36m:[0m80[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (108 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m78 |[0m             "- Reference `${ARTIFACT_ROOT}/reports/slice_08_<timestamp>.md` and `/reports/weekly_summary_<latest>.md` for context.",
+[1;38;5;12m79 |[0m             "- Capture blockers or dependency gaps below.",
+[1;38;5;12m80 |[0m             "- Guard Phase requires `.pre-commit-config.yaml` and hook activation notes to remain current.",
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m81 |[0m             "",
+[1;38;5;12m82 |[0m             "> Update this file with findings from each Analyze pass.",
+[1;38;5;12m   |[0m
+
+[1mmodules/readiness/reporter.py[0m[36m:[0m388[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (94 > 88)
+[1;38;5;12m    |[0m
+[1;38;5;12m386 |[0m             summary_text = item.get("summary", "Summary unavailable")
+[1;38;5;12m387 |[0m             lines.append(
+[1;38;5;12m388 |[0m                 f"- [ ] `{item.get('key')}` – {summary_text} _(Status: {status}; {category})_"
+[1;38;5;12m    |[0m[1;38;5;9m                                                                                         ^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m389 |[0m             )
+[1;38;5;12m390 |[0m             for note in item.get("notes", []):
+[1;38;5;12m    |[0m
+
+[1mmodules/snapshot_delta/analyzer.py[0m[36m:[0m260[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (92 > 88)
+[1;38;5;12m    |[0m
+[1;38;5;12m258 |[0m             for field, payload in item.get("changes", {}).items():
+[1;38;5;12m259 |[0m                 lines.append(
+[1;38;5;12m260 |[0m                     f"    - `{field}`: {payload.get('previous')} ➜ {payload.get('current')}"
+[1;38;5;12m    |[0m[1;38;5;9m                                                                                         ^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m261 |[0m                 )
+[1;38;5;12m    |[0m
+
+[1mmodules/summarize.py[0m[36m:[0m34[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (857 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m32 |[0m ) -> str:
+[1;38;5;12m33 |[0m     template = Template(
+[1;38;5;12m34 |[0m         """## Release Snapshot Update – {{ fix_version }} ({{ generated_date }})\n\n{{ prompt }}\n\n✅ Completed: {{ counts.get('done', 0) }}\n🔁 Moved: {{ counts.get('moved', 0) }}\n⚠️ Still Open: {{ counts.get('still_open', 0) }}\n🧾 Deployment Notes Updated: {{ counts.get('updated_notes', 0) }}\n\n### Highlights\n{% if items.get('new') %}- **New Issues**: {{ items['new'] | length }} added.\n{% endif %}{% if items.get('done') %}- **Completed**: {{ items['done'] | length }} transitioned to done.\n{% endif %}{% if items.get('moved') %}- **Moved**: {{ items['moved'] | length }} changed status or were removed.\n{% endif %}{% if items.get('updated_notes') %}- **Deployment Notes**: {{ items['updated_notes'] | length }} updated.\n{% endif %}{% if items.get('still_open') %}- **Open Risks**: {{ items['still_open'] | length }} still open.\n{% endif %}"""
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m35 |[0m     )
+[1;38;5;12m36 |[0m     return template.render(
+[1;38;5;12m   |[0m
+
+[1mmodules/utils/oauth.py[0m[36m:[0m28[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (111 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m26 |[0m         def authorization_url(self, *args, **kwargs):
+[1;38;5;12m27 |[0m             raise RuntimeError(
+[1;38;5;12m28 |[0m                 "requests_oauthlib is required for the authorization flow. Install the dependency to continue."
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m29 |[0m             )
+[1;38;5;12m   |[0m
+
+[1mmodules/utils/oauth.py[0m[36m:[0m33[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (111 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m31 |[0m         def fetch_token(self, *args, **kwargs):
+[1;38;5;12m32 |[0m             raise RuntimeError(
+[1;38;5;12m33 |[0m                 "requests_oauthlib is required for the authorization flow. Install the dependency to continue."
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m34 |[0m             )
+[1;38;5;12m   |[0m
+
+[1mmodules/utils/oauth.py[0m[36m:[0m38[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (95 > 88)
+[1;38;5;12m   |[0m
+[1;38;5;12m36 |[0m         def refresh_token(self, *args, **kwargs):
+[1;38;5;12m37 |[0m             raise RuntimeError(
+[1;38;5;12m38 |[0m                 "Token refresh requires requests_oauthlib. Install the dependency to continue."
+[1;38;5;12m   |[0m[1;38;5;9m                                                                                         ^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m39 |[0m             )
+[1;38;5;12m   |[0m
+
+[1msrc/validation.py[0m[36m:[0m111[36m:[0m89[36m:[0m [1;31mE501[0m Line too long (102 > 88)
+[1;38;5;12m    |[0m
+[1;38;5;12m109 |[0m         if not _type_matches(value, schema_types):
+[1;38;5;12m110 |[0m             errors.append(
+[1;38;5;12m111 |[0m                 f"Field '{field}' expected types {schema_types!r} but received {type(value).__name__}"
+[1;38;5;12m    |[0m[1;38;5;9m                                                                                         ^^^^^^^^^^^^^^[0m [1;38;5;9mE501[0m
+[1;38;5;12m112 |[0m             )
+[1;38;5;12m113 |[0m             continue
+[1;38;5;12m    |[0m
+
+Found 14 errors.
+
+black....................................................................[42mPassed[m
+mypy.....................................................................[41mFailed[m
+[2m- hook id: mypy[m
+[2m- exit code: 2[m
+
+src/__init__.py: [1m[31merror:(B[m Duplicate module named (B[m[1m"__main__"(B[m (also at (B[m[1m"modules/__init__.py"(B[m)(B[m[33m(B[m
+src/__init__.py: [34mnote:(B[m See [4mhttps://mypy.readthedocs.io/en/stable/running_mypy.html#mapping-file-paths-to-modules(B[m for more info(B[m
+src/__init__.py: [34mnote:(B[m Common resolutions include: a) using `--exclude` to avoid checking one of them, b) adding `__init__.py` somewhere, c) using `--explicit-package-bases` or adjusting MYPYPATH(B[m
+[1m[31mFound 1 error in 1 file (errors prevented further checking)(B[m
+
+bandit...................................................................[41mFailed[m
+[2m- hook id: bandit[m
+[2m- exit code: 1[m
+
+[main]	INFO	profile include tests: None
+[main]	INFO	profile exclude tests: None
+[main]	INFO	cli include tests: None
+[main]	INFO	cli exclude tests: None
+[main]	INFO	running on Python 3.12.10
+[95mRun started:2025-11-06 22:07:04.598003[0m
+[95m
+Test results:[0m
+[94m>> Issue: [B110:try_except_pass] Try, Except, Pass detected.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b110_try_except_pass.html
+   Location: ./modules/utils/helpers.py:79:8[0m
+78	            return datetime.now(tz=ZoneInfo(tz))
+79	        except Exception:  # pragma: no cover
+80	            pass
+81	    return datetime.now(timezone.utc)
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./modules/utils/http_retry.py:115:4[0m
+114	
+115	    assert last_exception is not None  # pragma: no cover - defensive
+116	    raise last_exception
+
+--------------------------------------------------
+[94m>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: ./scripts/add_to_project.py:9:0[0m
+8	import logging
+9	import subprocess
+10	import sys
+
+--------------------------------------------------
+[94m>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./scripts/add_to_project.py:59:17[0m
+58	        logging.debug("Fetching existing project items with command: %s", " ".join(cmd))
+59	        result = subprocess.run(
+60	            cmd,
+61	            check=True,
+62	            capture_output=True,
+63	            text=True,
+64	        )
+65	    except FileNotFoundError as exc:
+
+--------------------------------------------------
+[94m>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./scripts/add_to_project.py:137:8[0m
+136	    try:
+137	        subprocess.run(cmd, check=True)
+138	        message = f"✅ Added {project_title}"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:44:4[0m
+43	
+44	    assert config["paths"]["logs_dir"] == "custom_logs"
+45	    assert config["paths"]["reports_dir"] == "reports"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:45:4[0m
+44	    assert config["paths"]["logs_dir"] == "custom_logs"
+45	    assert config["paths"]["reports_dir"] == "reports"
+46	    assert config["jira"]["token_url"] == "https://auth.example.com/token"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:46:4[0m
+45	    assert config["paths"]["reports_dir"] == "reports"
+46	    assert config["jira"]["token_url"] == "https://auth.example.com/token"
+47	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:68:4[0m
+67	
+68	    assert config["paths"]["reports_dir"] == "artifact_reports"
+69	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:92:4[0m
+91	    config = load_config(override_path=tmp_path / "missing.yaml", defaults=defaults)
+92	    assert config["paths"]["logs_dir"] == "logs"
+93	    assert config["jira"]["base_url"] == "https://example"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:93:4[0m
+92	    assert config["paths"]["logs_dir"] == "logs"
+93	    assert config["jira"]["base_url"] == "https://example"
+94	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:105:4[0m
+104	    error_message = str(exc.value)
+105	    assert "Missing required setting 'jira.base_url'" in error_message
+106	    assert "paths.snapshot_dir" not in error_message
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_config_loader.py:106:4[0m
+105	    assert "Missing required setting 'jira.base_url'" in error_message
+106	    assert "paths.snapshot_dir" not in error_message
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_http_retry.py:35:4[0m
+34	
+35	    assert response.status_code == 200
+36	    assert len(attempts) == 2
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_http_retry.py:36:4[0m
+35	    assert response.status_code == 200
+36	    assert len(attempts) == 2
+37	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_http_retry.py:57:4[0m
+56	
+57	    assert response.status_code == 200
+58	    assert len(attempts) == 2
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_http_retry.py:58:4[0m
+57	    assert response.status_code == 200
+58	    assert len(attempts) == 2
+59	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:25:4[0m
+24	
+25	    assert data["message"] == "hello world"
+26	    assert data["slice_id"] == "04"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:26:4[0m
+25	    assert data["message"] == "hello world"
+26	    assert data["slice_id"] == "04"
+27	    assert data["phase"] == "build"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:27:4[0m
+26	    assert data["slice_id"] == "04"
+27	    assert data["phase"] == "build"
+28	    assert data["event"] == "config"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:28:4[0m
+27	    assert data["phase"] == "build"
+28	    assert data["event"] == "config"
+29	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:38:4[0m
+37	    log_path = tmp_path / "logs" / "slice.log"
+38	    assert log_path.exists()
+39	    content = log_path.read_text(encoding="utf-8").strip()
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:40:4[0m
+39	    content = log_path.read_text(encoding="utf-8").strip()
+40	    assert json.loads(content)["message"] == "persist message"
+41	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:50:4[0m
+49	    output = capsys.readouterr().out.strip()
+50	    assert "super-secret" not in output
+51	    assert "***" in output
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_logging_factory.py:51:4[0m
+50	    assert "super-secret" not in output
+51	    assert "***" in output
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:13:4[0m
+12	def test_token_expired_handles_variations() -> None:
+13	    assert oauth_utils._token_expired(None)
+14	    assert oauth_utils._token_expired({"expires_at": time.time() - 10})
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:14:4[0m
+13	    assert oauth_utils._token_expired(None)
+14	    assert oauth_utils._token_expired({"expires_at": time.time() - 10})
+15	    assert oauth_utils._token_expired({"expires_in": 0})
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:15:4[0m
+14	    assert oauth_utils._token_expired({"expires_at": time.time() - 10})
+15	    assert oauth_utils._token_expired({"expires_in": 0})
+16	    assert not oauth_utils._token_expired({"expires_at": time.time() + 3600})
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:16:4[0m
+15	    assert oauth_utils._token_expired({"expires_in": 0})
+16	    assert not oauth_utils._token_expired({"expires_at": time.time() + 3600})
+17	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:71:4[0m
+70	
+71	    assert session.refresh_kwargs is not None
+72	    assert session.refresh_kwargs["url"] == "https://example.com/token"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:72:4[0m
+71	    assert session.refresh_kwargs is not None
+72	    assert session.refresh_kwargs["url"] == "https://example.com/token"
+73	    assert session.verify == str(tmp_path / "corp.pem")
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:73:4[0m
+72	    assert session.refresh_kwargs["url"] == "https://example.com/token"
+73	    assert session.verify == str(tmp_path / "corp.pem")
+74	    assert saved_tokens, "token should be persisted after refresh"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:74:4[0m
+73	    assert session.verify == str(tmp_path / "corp.pem")
+74	    assert saved_tokens, "token should be persisted after refresh"
+75	    assert session.token.get("access_token") == "new"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_oauth_utils.py:75:4[0m
+74	    assert saved_tokens, "token should be persisted after refresh"
+75	    assert session.token.get("access_token") == "new"
+
+--------------------------------------------------
+[93m>> Issue: [B108:hardcoded_tmp_directory] Probable insecure usage of temp file/directory.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-377 (https://cwe.mitre.org/data/definitions/377.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b108_hardcoded_tmp_directory.html
+   Location: ./tests/test_orchestrator_cli.py:25:40[0m
+24	    monkeypatch.setenv("JIRA_SECRET", "super-secret")
+25	    monkeypatch.setenv("SSL_CERT_PATH", "/tmp/cert.pem")
+26	    monkeypatch.setenv("FIX_VERSION", "1.2.3")
+
+--------------------------------------------------
+[93m>> Issue: [B108:hardcoded_tmp_directory] Probable insecure usage of temp file/directory.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-377 (https://cwe.mitre.org/data/definitions/377.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b108_hardcoded_tmp_directory.html
+   Location: ./tests/test_orchestrator_cli.py:31:25[0m
+30	        "JIRA_SECRET": "super-secret",
+31	        "SSL_CERT_PATH": "/tmp/cert.pem",
+32	        "FIX_VERSION": "1.2.3",
+33	    }
+34	
+35	
+36	def test_analyze_creates_usage_artifact_and_progress(orchestrator_env):
+37	    orchestrator = Orchestrator(env=orchestrator_env)
+38	    usage_path = orchestrator.analyze()
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:40:4[0m
+39	
+40	    assert usage_path.exists()
+41	    content = usage_path.read_text(encoding="utf-8")
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:42:4[0m
+41	    content = usage_path.read_text(encoding="utf-8")
+42	    assert "CLI Orchestrator Usage" in content
+43	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:48:4[0m
+47	    stages = [event["stage"] for event in progress_data["events"]]
+48	    assert "analyze" in stages
+49	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:77:4[0m
+76	    plan = orchestrator.execute()
+77	    assert plan.version == "0.0.1"
+78	    assert plan.notes_path.exists()
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:78:4[0m
+77	    assert plan.version == "0.0.1"
+78	    assert plan.notes_path.exists()
+79	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:84:4[0m
+83	    stages = [event["stage"] for event in progress_data["events"]]
+84	    assert stages[0] == "execute:start"
+85	    assert "execute:complete" in stages
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:85:4[0m
+84	    assert stages[0] == "execute:start"
+85	    assert "execute:complete" in stages
+86	
+
+--------------------------------------------------
+[93m>> Issue: [B108:hardcoded_tmp_directory] Probable insecure usage of temp file/directory.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-377 (https://cwe.mitre.org/data/definitions/377.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b108_hardcoded_tmp_directory.html
+   Location: ./tests/test_orchestrator_cli.py:92:40[0m
+91	    monkeypatch.setenv("JIRA_SECRET", "super-secret")
+92	    monkeypatch.setenv("SSL_CERT_PATH", "/tmp/cert.pem")
+93	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:105:4[0m
+104	    notes = plan.notes
+105	    assert "super-secret" not in notes
+106	    assert "***" in notes
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:106:4[0m
+105	    assert "super-secret" not in notes
+106	    assert "***" in notes
+107	    assert plan.notes_path.name == "version_tag_notes_20240101T010101Z.md"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:107:4[0m
+106	    assert "***" in notes
+107	    assert plan.notes_path.name == "version_tag_notes_20240101T010101Z.md"
+108	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:119:4[0m
+118	    message = str(exc_info.value)
+119	    assert "JIRA_CLIENT_ID" in message
+120	    assert "JIRA_SECRET" in message
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_orchestrator_cli.py:120:4[0m
+119	    assert "JIRA_CLIENT_ID" in message
+120	    assert "JIRA_SECRET" in message
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:74:4[0m
+73	    readiness = aggregated["readiness"]
+74	    assert readiness["open_items"] == 3
+75	    assert readiness["total_issues"] == 4
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:75:4[0m
+74	    assert readiness["open_items"] == 3
+75	    assert readiness["total_issues"] == 4
+76	    assert readiness["score"] == 25
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:76:4[0m
+75	    assert readiness["total_issues"] == 4
+76	    assert readiness["score"] == 25
+77	    assert readiness["label"] == "At Risk"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:77:4[0m
+76	    assert readiness["score"] == 25
+77	    assert readiness["label"] == "At Risk"
+78	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:80:4[0m
+79	    checklist = aggregated["checklist"]
+80	    assert any(item["key"] == "ABC-1" for item in checklist)
+81	    assert any(
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:81:4[0m
+80	    assert any(item["key"] == "ABC-1" for item in checklist)
+81	    assert any(
+82	        "status: In Progress ➜ Blocked" in note
+83	        for item in checklist
+84	        for note in item["notes"]
+85	    )
+86	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:92:4[0m
+91	
+92	    assert "# Release Readiness" in markdown
+93	    assert "## Snapshot Details" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:93:4[0m
+92	    assert "# Release Readiness" in markdown
+93	    assert "## Snapshot Details" in markdown
+94	    assert "Prioritized Remediation Checklist" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:94:4[0m
+93	    assert "## Snapshot Details" in markdown
+94	    assert "Prioritized Remediation Checklist" in markdown
+95	    assert "`ABC-1`" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:95:4[0m
+94	    assert "Prioritized Remediation Checklist" in markdown
+95	    assert "`ABC-1`" in markdown
+96	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:108:4[0m
+107	
+108	    assert analysis_path is not None and analysis_path.exists()
+109	    assert report_path is not None and report_path.exists()
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:109:4[0m
+108	    assert analysis_path is not None and analysis_path.exists()
+109	    assert report_path is not None and report_path.exists()
+110	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:114:4[0m
+113	
+114	    assert "open_items" in analysis_data
+115	    assert "Release Readiness" in report_data
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:115:4[0m
+114	    assert "open_items" in analysis_data
+115	    assert "Release Readiness" in report_data
+116	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:161:4[0m
+160	    checklist = aggregated["checklist"]
+161	    assert checklist[0]["category"] == "New Issue"
+162	    assert checklist[1]["category"] == "Changed Issue"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:162:4[0m
+161	    assert checklist[0]["category"] == "New Issue"
+162	    assert checklist[1]["category"] == "Changed Issue"
+163	    assert "status: In Progress ➜ Blocked" in checklist[1]["notes"]
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:163:4[0m
+162	    assert checklist[1]["category"] == "Changed Issue"
+163	    assert "status: In Progress ➜ Blocked" in checklist[1]["notes"]
+164	    assert checklist[1]["summary"] == "Add rate limits"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:164:4[0m
+163	    assert "status: In Progress ➜ Blocked" in checklist[1]["notes"]
+164	    assert checklist[1]["summary"] == "Add rate limits"
+165	    assert aggregated["readiness"]["open_items"] == 2
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_readiness_reporter.py:165:4[0m
+164	    assert checklist[1]["summary"] == "Add rate limits"
+165	    assert aggregated["readiness"]["open_items"] == 2
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:24:4[0m
+23	    )
+24	    assert report_path == expected_path
+25	    assert expected_path.parent.exists()
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:25:4[0m
+24	    assert report_path == expected_path
+25	    assert expected_path.parent.exists()
+26	    assert "--cov=modules" in args
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:26:4[0m
+25	    assert expected_path.parent.exists()
+26	    assert "--cov=modules" in args
+27	    assert "--cov=src" in args
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:27:4[0m
+26	    assert "--cov=modules" in args
+27	    assert "--cov=src" in args
+28	    assert f"--cov-report=term-missing:{expected_path}" in args
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:28:4[0m
+27	    assert "--cov=src" in args
+28	    assert f"--cov-report=term-missing:{expected_path}" in args
+29	    assert args[-2:] == ["-k", "snapshot"]
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:29:4[0m
+28	    assert f"--cov-report=term-missing:{expected_path}" in args
+29	    assert args[-2:] == ["-k", "snapshot"]
+30	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:52:4[0m
+51	
+52	    assert exit_code == 0
+53	    assert captured_args
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:53:4[0m
+52	    assert exit_code == 0
+53	    assert captured_args
+54	    cov_args = captured_args[0]
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:55:4[0m
+54	    cov_args = captured_args[0]
+55	    assert any(item.startswith("--cov-report=term-missing:") for item in cov_args)
+56	    assert any(item == "--cov=modules" for item in cov_args)
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:56:4[0m
+55	    assert any(item.startswith("--cov-report=term-missing:") for item in cov_args)
+56	    assert any(item == "--cov=modules" for item in cov_args)
+57	    assert any(item == "--cov=src" for item in cov_args)
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_run_tests_script.py:57:4[0m
+56	    assert any(item == "--cov=modules" for item in cov_args)
+57	    assert any(item == "--cov=src" for item in cov_args)
+
+--------------------------------------------------
+[93m>> Issue: [B108:hardcoded_tmp_directory] Probable insecure usage of temp file/directory.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-377 (https://cwe.mitre.org/data/definitions/377.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b108_hardcoded_tmp_directory.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:63:26[0m
+62	        previous,
+63	        current_path=Path("/tmp/snapshot_202408.json"),
+64	        previous_path=Path("/tmp/snapshot_202407.json"),
+
+--------------------------------------------------
+[93m>> Issue: [B108:hardcoded_tmp_directory] Probable insecure usage of temp file/directory.
+   Severity: Medium   Confidence: Medium
+   CWE: CWE-377 (https://cwe.mitre.org/data/definitions/377.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b108_hardcoded_tmp_directory.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:64:27[0m
+63	        current_path=Path("/tmp/snapshot_202408.json"),
+64	        previous_path=Path("/tmp/snapshot_202407.json"),
+65	    )
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:68:4[0m
+67	    summary = result["summary"]
+68	    assert summary["added"] == 1
+69	    assert summary["removed"] == 1
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:69:4[0m
+68	    assert summary["added"] == 1
+69	    assert summary["removed"] == 1
+70	    assert summary["changed"] == 1
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:70:4[0m
+69	    assert summary["removed"] == 1
+70	    assert summary["changed"] == 1
+71	    assert summary["unchanged"] == 0
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:71:4[0m
+70	    assert summary["changed"] == 1
+71	    assert summary["unchanged"] == 0
+72	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:75:4[0m
+74	    changes = changed_issue["changes"]
+75	    assert changes["status"]["previous"] == "In Review"
+76	    assert changes["status"]["current"] == "Ready for Prod"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:76:4[0m
+75	    assert changes["status"]["previous"] == "In Review"
+76	    assert changes["status"]["current"] == "Ready for Prod"
+77	    assert changes["deployment_notes"]["current"] == "Ready"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:77:4[0m
+76	    assert changes["status"]["current"] == "Ready for Prod"
+77	    assert changes["deployment_notes"]["current"] == "Ready"
+78	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:80:4[0m
+79	    added_issue = result["details"]["added"][0]
+80	    assert added_issue["credential"] == "MASKED"
+81	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:83:4[0m
+82	    removed_issue = result["details"]["removed"][0]
+83	    assert removed_issue["key"] == "ABC-3"
+84	    assert removed_issue["deployment_notes"] == "Shipped"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:84:4[0m
+83	    assert removed_issue["key"] == "ABC-3"
+84	    assert removed_issue["deployment_notes"] == "Shipped"
+85	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:87:4[0m
+86	    metadata = result["metadata"]
+87	    assert metadata["current_snapshot"] == "snapshot_202408.json"
+88	    assert metadata["previous_snapshot"] == "snapshot_202407.json"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:88:4[0m
+87	    assert metadata["current_snapshot"] == "snapshot_202408.json"
+88	    assert metadata["previous_snapshot"] == "snapshot_202407.json"
+89	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:97:4[0m
+96	
+97	    assert markdown.startswith("# Snapshot Delta")
+98	    assert "## Summary" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:98:4[0m
+97	    assert markdown.startswith("# Snapshot Delta")
+98	    assert "## Summary" in markdown
+99	    assert "### Field Changes" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:99:4[0m
+98	    assert "## Summary" in markdown
+99	    assert "### Field Changes" in markdown
+100	    assert "## Changed Issues" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:100:4[0m
+99	    assert "### Field Changes" in markdown
+100	    assert "## Changed Issues" in markdown
+101	    assert "`ABC-2`" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_delta_analyzer.py:101:4[0m
+100	    assert "## Changed Issues" in markdown
+101	    assert "`ABC-2`" in markdown
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:81:4[0m
+80	
+81	    assert len(issues) == 1
+82	    assert issues[0]["key"] == "ABC-1"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:82:4[0m
+81	    assert len(issues) == 1
+82	    assert issues[0]["key"] == "ABC-1"
+83	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:87:4[0m
+86	    )
+87	    assert snapshot_path.exists()
+88	    written = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:89:4[0m
+88	    written = json.loads(snapshot_path.read_text(encoding="utf-8"))
+89	    assert written["fixVersion"] == "1.0.0"
+90	    assert written["issues"][0]["deployment_notes"] == "Notes"
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:90:4[0m
+89	    assert written["fixVersion"] == "1.0.0"
+90	    assert written["issues"][0]["deployment_notes"] == "Notes"
+91	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:105:4[0m
+104	
+105	    assert issues  # falls back to bundled mock payload
+106	    assert all(issue["fixVersions"] == ["9.9.9"] for issue in issues)
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:106:4[0m
+105	    assert issues  # falls back to bundled mock payload
+106	    assert all(issue["fixVersions"] == ["9.9.9"] for issue in issues)
+107	
+
+--------------------------------------------------
+[94m>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/0.0.0/plugins/b101_assert_used.html
+   Location: ./tests/test_snapshot_module.py:111:4[0m
+110	    )
+111	    assert snapshot_path.exists()
+
+--------------------------------------------------
+[95m
+Code scanned:[0m
+	Total lines of code: 3346
+	Total lines skipped (#nosec): 0
+[95m
+Run metrics:[0m
+	Total issues (by severity):
+		Undefined: 0
+		Low: 101
+		Medium: 5
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 5
+		High: 101
+[95mFiles skipped (0):[0m
+
+pytest...................................................................[42mPassed[m

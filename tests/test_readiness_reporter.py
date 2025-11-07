@@ -78,7 +78,11 @@ def test_aggregate_readiness_scores_open_items(sample_delta: dict[str, object]) 
 
     checklist = aggregated["checklist"]
     assert any(item["key"] == "ABC-1" for item in checklist)
-    assert any("status: In Progress ➜ Blocked" in note for item in checklist for note in item["notes"])
+    assert any(
+        "status: In Progress ➜ Blocked" in note
+        for item in checklist
+        for note in item["notes"]
+    )
 
 
 def test_format_markdown_contains_sections(sample_delta: dict[str, object]) -> None:
@@ -91,7 +95,9 @@ def test_format_markdown_contains_sections(sample_delta: dict[str, object]) -> N
     assert "`ABC-1`" in markdown
 
 
-def test_generate_readiness_report_persists_artifacts(tmp_path: Path, sample_delta: dict[str, object]) -> None:
+def test_generate_readiness_report_persists_artifacts(
+    tmp_path: Path, sample_delta: dict[str, object]
+) -> None:
     os.environ["ARTIFACT_ROOT"] = str(tmp_path)
 
     result = reporter.generate_readiness_report(sample_delta, persist=True)
@@ -110,6 +116,7 @@ def test_generate_readiness_report_persists_artifacts(tmp_path: Path, sample_del
 
     # Clean up environment override
     del os.environ["ARTIFACT_ROOT"]
+
 
 def test_aggregate_readiness_merges_duplicate_entries() -> None:
     delta = {

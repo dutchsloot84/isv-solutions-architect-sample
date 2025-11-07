@@ -13,7 +13,6 @@ except ImportError:
 from .utils import helpers
 from .utils.logger import get_logger
 
-
 LOGGER = get_logger(__name__)
 
 
@@ -65,21 +64,15 @@ def _render_fallback(
     if items.get("new"):
         lines.append(f"- **New Issues**: {len(items['new'])} added.")
     if items.get("done"):
-        lines.append(
-            f"- **Completed**: {len(items['done'])} transitioned to done."
-        )
+        lines.append(f"- **Completed**: {len(items['done'])} transitioned to done.")
     if items.get("moved"):
         lines.append(
             f"- **Moved**: {len(items['moved'])} changed status or were removed."
         )
     if items.get("updated_notes"):
-        lines.append(
-            f"- **Deployment Notes**: {len(items['updated_notes'])} updated."
-        )
+        lines.append(f"- **Deployment Notes**: {len(items['updated_notes'])} updated.")
     if items.get("still_open"):
-        lines.append(
-            f"- **Open Risks**: {len(items['still_open'])} still open."
-        )
+        lines.append(f"- **Open Risks**: {len(items['still_open'])} still open.")
     return "\n".join(lines)
 
 
@@ -101,16 +94,10 @@ def create_markdown_report(delta_path: Path | str) -> Path:
     items: Dict[str, List] = delta.get("items", {})
 
     if Template is not None:
-        markdown = _render_with_jinja(
-            delta, counts, items, prompt_text, generated_date
-        )
+        markdown = _render_with_jinja(delta, counts, items, prompt_text, generated_date)
     else:
-        LOGGER.warning(
-            "jinja2 not installed; falling back to basic string rendering"
-        )
-        markdown = _render_fallback(
-            delta, counts, items, prompt_text, generated_date
-        )
+        LOGGER.warning("jinja2 not installed; falling back to basic string rendering")
+        markdown = _render_fallback(delta, counts, items, prompt_text, generated_date)
 
     reports_dir_setting = config["paths"].get("reports_dir", "reports")
     reports_dir_path = Path(reports_dir_setting)

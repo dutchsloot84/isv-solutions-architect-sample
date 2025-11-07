@@ -56,7 +56,9 @@ class _JsonFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:  # noqa: D401 - interface method
         payload: Dict[str, Any] = {
-            "timestamp": datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
+            "timestamp": datetime.fromtimestamp(
+                record.created, tz=timezone.utc
+            ).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -99,7 +101,9 @@ class LoggerFactory:
 
     def __post_init__(self) -> None:
         secrets = [os.getenv("JIRA_SECRET"), os.getenv("SSL_CERT_PATH")]
-        self._masked_values = [value for value in [*self.masked_values, *secrets] if value]
+        self._masked_values = [
+            value for value in [*self.masked_values, *secrets] if value
+        ]
         self._loggers = {}
 
     def get_logger(
@@ -148,7 +152,10 @@ class LoggerFactory:
     ) -> None:
         path = self._resolve_log_path(log_file)
         for handler in logger.handlers:
-            if isinstance(handler, logging.FileHandler) and Path(handler.baseFilename) == path:
+            if (
+                isinstance(handler, logging.FileHandler)
+                and Path(handler.baseFilename) == path
+            ):
                 return
 
         file_handler = logging.FileHandler(path, encoding="utf-8")
