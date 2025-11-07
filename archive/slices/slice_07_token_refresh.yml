@@ -1,0 +1,17 @@
+id: 07
+title: Token Refresh & SSL Recovery
+phase: guard
+branch: slice/07-token-refresh
+depends_on: [06]
+description: >
+  Implement token refresh logic and SSL retry mechanisms for OAuth 3LO with backoff.
+tasks:
+  - name: Add token refresh handler
+    output: src/oauth_client.py
+  - name: Implement SSL retry/backoff logic
+    output: src/http_retry.py
+artifacts:
+  - ${ARTIFACT_ROOT}/logs/auth_refresh_<timestamp>.log
+success_criteria:
+  - Expired tokens refresh automatically
+  - SSL/network errors recover gracefully

@@ -1,0 +1,2 @@
+2025-11-07T16:00:00Z,sanitizer_check,pass,Masking helpers verified via tests and coverage artifacts
+2025-11-07T16:00:00Z,artifact_scan,pass,Reviewed data/reports/coverage_summary_20251107.txt and pytest logs for secret placeholders

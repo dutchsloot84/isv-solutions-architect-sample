@@ -1,0 +1,17 @@
+id: 10
+title: Security Sanitizer & Audit Log
+phase: guard
+branch: slice/10-security-sanitizer
+depends_on: [09]
+description: >
+  Mask tokens, redact sensitive data in logs, and generate a security audit report.
+tasks:
+  - name: Add mask_sensitive() and sanitize_logs() functions
+    output: src/logger.py
+  - name: Generate security audit report
+    output: logs/security_audit_<timestamp>.log
+artifacts:
+  - ${ARTIFACT_ROOT}/logs/security_audit_<timestamp>.log
+success_criteria:
+  - No secrets appear in logs
+  - Security audit report generated successfully

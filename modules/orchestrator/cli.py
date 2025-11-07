@@ -34,7 +34,7 @@ class Orchestrator:
     force_update: bool = False
     release_type: str = "patch"
     current_tag: Optional[str] = None
-    env: Optional[Mapping[str, str]] = None
+    env: MutableMapping[str, str] = field(default_factory=dict)
     snapshot_fetcher: SnapshotFetcher = snapshot.fetch_jql_results
     delta_generator: DeltaGenerator = compare.generate_delta
     report_builder: ReportBuilder = summarize.create_markdown_report
@@ -44,7 +44,10 @@ class Orchestrator:
     phase: str = "guard"
 
     def __post_init__(self) -> None:
-        self.env = dict(os.environ) if self.env is None else dict(self.env)
+        if self.env:
+            self.env = dict(self.env)
+        else:
+            self.env = dict(os.environ)
         self.fix_version = self.fix_version or self.env.get("FIX_VERSION")
         self._timestamp = helpers.timestamp_for_filename()
         self._artifact_root = helpers.artifact_path(self.slice_id)
@@ -207,17 +210,25 @@ class Orchestrator:
             "details": dict(details),
             "timestamp": helpers.current_timestamp().isoformat(),
         }
-        payload: MutableMapping[str, object]
         if self._progress_path.exists():
-            payload = helpers.read_json(self._progress_path)
+            payload = dict(helpers.read_json(self._progress_path))
         else:
             payload = {
                 "slice_id": self.slice_id,
                 "phase": self.phase,
                 "events": [],
             }
-        events = list(payload.get("events", []))
-        events.append(entry)
+
+        events_data = payload.get("events")
+        events: list[Dict[str, object]]
+        if isinstance(events_data, list):
+            events = [
+                dict(event) for event in events_data if isinstance(event, Mapping)
+            ]
+        else:
+            events = []
+
+        events.append(dict(entry))
         payload["events"] = events
         helpers.write_json_safe(payload, self._progress_path)
         return self._progress_path
