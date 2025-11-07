@@ -36,11 +36,10 @@ pip install -r requirements.txt
 
 ## 🔐 Jira OAuth 3LO Authorization
 
-The Release Intelligence tool now supports a fully automatic OAuth 3LO authorization flow.
+The Release Snapshot Manager authenticates securely with Jira Cloud using OAuth 2.0 (3-legged).
 
 ### 1️⃣ Prerequisites
-
-Ensure your `.env` file includes the following values from your Atlassian Developer Console:
+Ensure your `.env` file includes:
 
 ```env
 JIRA_CLIENT_ID=<your_client_id>
@@ -51,40 +50,52 @@ JIRA_BASE_URL=https://csaaig.atlassian.net
 
 ### 2️⃣ Run Authorization
 
-Run the following command:
-
 ```bash
 python -m modules.utils.oauth authorize
 ```
 
-This will:
+This command:
 
-- Launch your browser for Atlassian login
-- Capture the authorization code automatically from `http://localhost:8000/callback`
-- Exchange it for an access token
-- Save the token securely to `.secrets/jira_token.json`
+- Launches your browser for Atlassian login.
+- Captures the authorization code automatically from `http://localhost:8000/callback`.
+- Exchanges it for an access token.
+- Saves the token securely to `.secrets/jira_token.json`.
 
-When successful, you’ll see:
+Expected success message:
 
 ```
 ✅ Authorization complete! Token saved to .secrets/jira_token.json
 ```
 
-### 3️⃣ Token Reuse
+### 3️⃣ Token Expiration
 
-If a valid token already exists, the script will reuse it automatically and skip reauthorization:
+Atlassian Jira Cloud apps do not currently support `offline_access` for all integrations. As a result, only a short-lived `access_token` is issued (typically valid for ~1 hour).
 
-```
-✅ Existing Jira access token is still valid.
-```
-
-### 4️⃣ Manual Fallback (rare)
-
-If your environment blocks `localhost:8000` redirects, copy the code from the browser URL and run:
+When the token expires, simply re-run:
 
 ```bash
-python -m modules.utils.oauth complete <auth_code>
+python -m modules.utils.oauth authorize
 ```
+
+You’ll see:
+
+```
+⚠️ Token expired — please reauthorize with `python -m modules.utils.oauth authorize`
+```
+
+Tokens are stored automatically under `.secrets/jira_token.json` and excluded from version control.
+
+### 4️⃣ Troubleshooting
+
+- **Error: `(access_denied)` Unauthorized** – Ensure your `.env` contains the correct client ID/secret.
+- Verify your redirect URI matches exactly `http://localhost:8000/callback`.
+- Re-run authorization after saving `.env`.
+
+✅ Expected Behavior
+
+- Authorization completes successfully with `read:jira-work write:jira-work` scopes.
+- `.secrets/jira_token.json` contains an `access_token` (no `refresh_token` expected).
+- The tool gracefully requests reauthorization once expired.
 
 ## Usage
 

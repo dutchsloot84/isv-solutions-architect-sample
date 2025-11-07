@@ -36,7 +36,6 @@ class DummyOAuthSession:
 
         return {
             "access_token": "abc",
-            "refresh_token": "refresh-123",
             "token_type": "Bearer",
             "expires_in": 3600,
             "expires_at": time.time() + 3600,
@@ -105,9 +104,7 @@ def test_token_exchange_success(
     token = oauth_utils.authorize_jira()
 
     assert token["access_token"] == "abc"
-    assert token["refresh_token"] == "refresh-123"
     assert saved_token["access_token"] == "abc"
-    assert saved_token["refresh_token"] == "refresh-123"
     assert dummy_session.fetch_kwargs is not None
     assert dummy_session.fetch_kwargs["auth"] == ("abcd1234client", "supersecret")
     assert dummy_session.fetch_kwargs["include_client_id"] is False
@@ -177,8 +174,6 @@ def test_complete_authorization_uses_basic_auth(
     tokens = oauth_utils.complete_authorization("auth-code-xyz")
 
     assert tokens["access_token"] == "abc"
-    assert tokens["refresh_token"] == "refresh-456"
-    assert saved["refresh_token"] == "refresh-456"
     assert captured["auth"] == ("abcd1234client", "supersecret")
     assert captured["json"]["audience"] == "api.atlassian.com"
     basic_auth = requests.auth.HTTPBasicAuth(*captured["auth"])
@@ -236,10 +231,64 @@ def test_authorize_jira_persists_token_and_logs_success(
     assert token_path.exists()
     data = json.loads(token_path.read_text(encoding="utf-8"))
     assert data["access_token"] == "abc"
-    assert "refresh_token" in data
     assert any(
         "✅ Access token successfully retrieved" in message for message in info_messages
     )
+
+
+def test_authorize_jira_warns_when_refresh_token_missing(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    class NoRefreshSession(DummyOAuthSession):
+        def fetch_token(self, *args: Any, **kwargs: Any) -> Dict[str, Any]:  # type: ignore[override]
+            super().fetch_token(*args, **kwargs)
+            return {
+                "access_token": "abc",
+                "expires_in": 3600,
+                "expires_at": time.time() + 3600,
+            }
+
+    dummy_session = NoRefreshSession()
+    token_path = tmp_path / ".secrets" / "jira_token.json"
+
+    monkeypatch.setenv("JIRA_CLIENT_ID", "abcd1234client")
+    monkeypatch.setenv("JIRA_SECRET", "supersecret")
+    monkeypatch.setenv("OAUTH_BROWSER_OPEN", "0")
+
+    monkeypatch.setattr(
+        oauth_utils,
+        "load_config",
+        lambda: {
+            "jira": {
+                "auth_url": "https://example.com/authorize",
+                "token_url": "https://example.com/token",
+                "redirect_uri": "http://localhost:8000/callback",
+                "token_path": str(token_path),
+                "api_scope": "read:me",
+            }
+        },
+    )
+    monkeypatch.setattr(oauth_utils, "_build_oauth_session", lambda config: dummy_session)
+    monkeypatch.setattr(oauth_utils, "ssl_verify_path", lambda: None)
+    monkeypatch.setattr(oauth_utils, "HTTPServer", DummyHTTPServer)
+    monkeypatch.setattr(oauth_utils.webbrowser, "open", lambda *_: True)
+
+    warnings: list[str] = []
+    original_warning = oauth_utils.LOGGER.warning
+
+    def warning_spy(msg: str, *args: Any, **kwargs: Any) -> Any:
+        warnings.append(str(msg))
+        return original_warning(msg, *args, **kwargs)
+
+    monkeypatch.setattr(oauth_utils.LOGGER, "warning", warning_spy)
+
+    oauth_utils.OAuthCallbackHandler.auth_code = "auth-code-123"
+    oauth_utils.OAuthCallbackHandler.error = None
+
+    oauth_utils.authorize_jira()
+
+    assert any("No refresh_token received" in message for message in warnings)
 
 
 def test_authorize_jira_skips_when_token_valid(

@@ -34,7 +34,7 @@ DEFAULTS: Mapping[str, Any] = {
         "base_url": "",
         "auth_url": "",
         "token_url": "",
-        "api_scope": "read:jira-work offline_access",
+        "api_scope": "read:jira-work write:jira-work",
         "token_path": ".secrets/jira_token.json",
         "redirect_uri": "http://localhost:8080/callback",
         "jql_fields": ["key", "summary", "status"],

@@ -114,7 +114,21 @@ def _build_oauth_session(config: dict, token: Optional[dict] = None) -> OAuth2Se
         raise RuntimeError("Environment variable JIRA_CLIENT_ID is required")
 
     redirect_uri = config["jira"].get("redirect_uri")
-    scope = config["jira"].get("api_scope")
+    configured_scope = config["jira"].get("api_scope")
+    if isinstance(configured_scope, str):
+        scope = configured_scope.split()
+    elif isinstance(configured_scope, (list, tuple)):
+        scope = list(configured_scope)
+    else:
+        scope = []
+
+    if not scope:
+        scope = ["read:jira-work", "write:jira-work"]
+
+    extra_scope = os.getenv("JIRA_SCOPES", "")
+    extra_scope_values = {s.strip() for s in extra_scope.split() if s.strip()}
+    if "offline_access" in extra_scope_values and "offline_access" not in scope:
+        scope.append("offline_access")
     token_url = config["jira"].get("token_url")
 
     secret = os.environ.get("JIRA_SECRET", "")
@@ -183,6 +197,19 @@ def token_is_valid(token: dict) -> bool:
 
     buffer = timedelta(minutes=5)
     return datetime.now(timezone.utc) < (expiry - buffer)
+
+
+def is_token_expired(token: Optional[dict]) -> bool:
+    """Return True if the token has expired."""
+
+    if not token:
+        return True
+
+    exp_time = token.get("expires_at") or 0
+    try:
+        return time.time() > float(exp_time)
+    except (TypeError, ValueError):
+        return True
 
 
 def _should_open_browser() -> bool:
@@ -464,6 +491,10 @@ def authorize_jira() -> dict:
             LOGGER.debug("Unable to derive expires_at from expires_in", exc_info=True)
 
     token_path = save_token(token, config)
+    if "refresh_token" not in token:
+        LOGGER.warning(
+            "No refresh_token received — offline_access not supported by this app."
+        )
     OAuthCallbackHandler.auth_code = None
     OAuthCallbackHandler.error = None
     LOGGER.info(
@@ -564,6 +595,17 @@ def get_jira_session() -> OAuth2Session:
 
     if not token:
         raise RuntimeError("No OAuth token found. Run the authorize_jira flow first.")
+
+    if is_token_expired(token):
+        LOGGER.info(
+            "⚠️ Token expired — please reauthorize with `python -m modules.utils.oauth authorize`"
+        )
+        authorize_jira()
+        token = _load_token(config)
+        if not token:
+            raise RuntimeError(
+                "OAuth token missing after reauthorization. Please rerun the authorize command."
+            )
 
     session = _build_oauth_session(config, token=token)
 

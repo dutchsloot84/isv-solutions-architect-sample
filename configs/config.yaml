@@ -4,7 +4,7 @@
       "base_url": "https://jira.yourcompany.com",
       "auth_url": "https://auth.atlassian.com/authorize",
       "token_url": "https://auth.atlassian.com/oauth/token",
-      "api_scope": "read:jira-work write:jira-work offline_access",
+      "api_scope": "read:jira-work write:jira-work",
       "token_path": ".secrets/jira_token.json",
       "redirect_uri": "http://localhost:8080/callback",
       "jql_fields":
