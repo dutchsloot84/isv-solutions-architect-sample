@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterable, Mapping, MutableMapping, Optional
+from typing import Any, Dict, Iterable, Mapping, MutableMapping, Optional, cast
 
 try:
     from dotenv import load_dotenv
@@ -26,7 +26,7 @@ except ImportError:  # pragma: no cover - optional dependency fallback
                 return _json.loads(stream.read())
             return _json.loads(stream)
 
-    yaml = _SimpleYAML()
+    yaml = cast(Any, _SimpleYAML())
 
 
 DEFAULTS: Mapping[str, Any] = {

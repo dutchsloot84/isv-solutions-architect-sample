@@ -4,14 +4,16 @@ from __future__ import annotations
 
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple
 
-try:
+if TYPE_CHECKING:
     from deepdiff import DeepDiff
-except ImportError:
+else:
+    try:
+        from deepdiff import DeepDiff
+    except ImportError:
 
-    class DeepDiff(dict):  # type: ignore[misc]
-        def __new__(cls, *args, **kwargs):
+        def DeepDiff(*args: Any, **kwargs: Any) -> Dict[str, Any]:  # type: ignore[misc]
             value1, value2 = args[:2]
             return (
                 {}

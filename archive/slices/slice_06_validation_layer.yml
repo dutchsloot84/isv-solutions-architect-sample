@@ -1,0 +1,18 @@
+id: 06
+title: Validation Layer
+phase: guard
+branch: slice/06-validation-layer
+depends_on: [05]
+description: >
+  Add schema validation and missing-field guards for Jira data to prevent runtime errors.
+tasks:
+  - name: Create Jira JSON schema and validation module
+    output: schemas/jira_issue_schema.json
+  - name: Integrate validation step in snapshot and delta analyzer
+    output: src/validation.py
+artifacts:
+  - ${ARTIFACT_ROOT}/schemas/jira_issue_schema.json
+  - ${ARTIFACT_ROOT}/logs/validation_run_<timestamp>.log
+success_criteria:
+  - Validation errors logged clearly
+  - Invalid payloads skipped safely

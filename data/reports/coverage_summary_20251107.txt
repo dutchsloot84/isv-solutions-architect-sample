@@ -1,0 +1,27 @@
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+modules/__init__.py                      0      0   100%
+modules/compare.py                      63     51    19%   14-18, 37, 45-100, 105-143
+modules/config/__init__.py               2      2     0%   3-5
+modules/config/loader.py               100     46    54%   3-81, 87-92, 95, 106, 117-124, 136, 141, 150, 153, 161-166, 169, 174-175, 183, 187, 192, 195-196, 200
+modules/logging/__init__.py              2      0   100%
+modules/logging/factory.py              80      3    96%   108, 146, 160
+modules/orchestrator/__init__.py         3      0   100%
+modules/orchestrator/cli.py            131     34    74%   50, 98, 139-153, 158, 173, 201, 231, 243-273, 277-292, 296
+modules/orchestrator/versioning.py      66      6    91%   86, 91, 97-99, 130
+modules/readiness/__init__.py            2      0   100%
+modules/readiness/reporter.py          241     31    87%   57, 59-62, 68, 73, 78-80, 98-101, 143-144, 196, 221-230, 237, 247-249, 255, 259, 261, 286, 383, 421
+modules/snapshot.py                     43      0   100%
+modules/snapshot_delta/__init__.py       9      2    78%   16-17
+modules/snapshot_delta/analyzer.py     196     62    68%   33, 35, 42, 48, 65, 96, 131, 175-180, 199-205, 229, 239-244, 265-279, 285-292, 296-297, 303-304, 308-327, 331-339, 343
+modules/summarize.py                    56     44    21%   10-11, 20-23, 33-36, 52-76, 81-110
+modules/utils/__init__.py                0      0   100%
+modules/utils/helpers.py                71      1    99%   53
+modules/utils/http_retry.py             50      5    90%   31-33, 89-97, 117
+modules/utils/logger.py                  9      0   100%
+modules/utils/oauth.py                 145     87    40%   19-45, 64-76, 82, 87-101, 114-120, 124-128, 133-176, 185, 192, 227-228, 234-237, 259-268, 281-292
+src/__init__.py                          2      2     0%   3-5
+src/logger.py                           85     23    73%   3-31, 39, 50, 61, 71-77, 93, 104, 121, 153
+src/validation.py                       97     24    75%   21, 52, 55, 57, 63, 68, 75, 79, 87, 95, 101, 106, 110-113, 126-137, 149-155
+------------------------------------------------------------------
+TOTAL                                 1453    423    71%

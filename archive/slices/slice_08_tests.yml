@@ -1,0 +1,18 @@
+id: 08
+title: Unit & Integration Tests
+phase: guard
+branch: slice/08-tests
+depends_on: [07]
+description: >
+  Build pytest suite with mock Jira data and ensure ≥70% coverage across core modules.
+tasks:
+  - name: Add unit tests for snapshot, delta, reporter, and CLI
+    output: tests/test_*.py
+  - name: Integrate pytest-cov coverage report
+    output: reports/coverage_summary_<date>.txt
+artifacts:
+  - ${ARTIFACT_ROOT}/reports/test_results_<date>.xml
+  - ${ARTIFACT_ROOT}/reports/coverage_summary_<date>.txt
+success_criteria:
+  - pytest passes all tests
+  - Coverage ≥70%

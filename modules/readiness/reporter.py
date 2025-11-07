@@ -14,6 +14,7 @@ from typing import (
     Optional,
     Sequence,
     Tuple,
+    cast,
 )
 
 from modules.utils import helpers
@@ -324,9 +325,10 @@ def aggregate_readiness(
     }
 
     removed = details.get("removed") or []
-    aggregated["summary"]["removed"] = len(removed)
-    aggregated["summary"]["added"] = len(details.get("added") or [])
-    aggregated["summary"]["changed"] = len(details.get("changed") or [])
+    summary_section = cast(MutableMapping[str, Any], aggregated["summary"])
+    summary_section["removed"] = len(removed)
+    summary_section["added"] = len(details.get("added") or [])
+    summary_section["changed"] = len(details.get("changed") or [])
 
     return aggregated
 

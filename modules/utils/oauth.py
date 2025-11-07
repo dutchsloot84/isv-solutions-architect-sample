@@ -8,38 +8,41 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from urllib.parse import parse_qs, urlparse
 
-try:
+if TYPE_CHECKING:
     from requests_oauthlib import OAuth2Session
-except ImportError:
-    import requests
+else:
+    try:
+        from requests_oauthlib import OAuth2Session
+    except ImportError:
+        import requests
 
-    class OAuth2Session:  # type: ignore[misc]
-        def __init__(self, *args, **kwargs):
-            self.token = kwargs.get("token")
-            self.verify = kwargs.get("verify")
-            self._session = requests.Session()
-            self.token_updater = kwargs.get("token_updater")
+        class OAuth2Session:  # type: ignore[misc]
+            def __init__(self, *args, **kwargs):
+                self.token = kwargs.get("token")
+                self.verify = kwargs.get("verify")
+                self._session = requests.Session()
+                self.token_updater = kwargs.get("token_updater")
 
-        def authorization_url(self, *args, **kwargs):
-            raise RuntimeError(
-                "requests_oauthlib is required for the authorization flow. Install the dependency to continue."
-            )
+            def authorization_url(self, *args, **kwargs):
+                raise RuntimeError(
+                    "requests_oauthlib is required for the authorization flow. Install the dependency to continue."
+                )
 
-        def fetch_token(self, *args, **kwargs):
-            raise RuntimeError(
-                "requests_oauthlib is required for the authorization flow. Install the dependency to continue."
-            )
+            def fetch_token(self, *args, **kwargs):
+                raise RuntimeError(
+                    "requests_oauthlib is required for the authorization flow. Install the dependency to continue."
+                )
 
-        def refresh_token(self, *args, **kwargs):
-            raise RuntimeError(
-                "Token refresh requires requests_oauthlib. Install the dependency to continue."
-            )
+            def refresh_token(self, *args, **kwargs):
+                raise RuntimeError(
+                    "Token refresh requires requests_oauthlib. Install the dependency to continue."
+                )
 
-        def get(self, url, **kwargs):
-            return self._session.get(url, **kwargs)
+            def get(self, url, **kwargs):
+                return self._session.get(url, **kwargs)
 
 
 from .helpers import load_config, resolve_path, ssl_verify_path
