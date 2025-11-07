@@ -18,14 +18,13 @@ The Release Snapshot Manager automates release readiness reporting for Jira Clou
 
 ### Required Environment Variables
 
-```
-JIRA_CLIENT_ID
-JIRA_SECRET
-SSL_CERT_PATH
-ARTIFACT_ROOT
-```
+At minimum, configure the following values in your environment or `.env` file:
 
-Set `FIX_VERSION` to supply a default fix version when the CLI flag is omitted. Optional overrides for Jira endpoints and path locations may be provided via environment variables that match the structure of `configs/config.yaml` (for example `JIRA_BASE_URL`, `JIRA_AUTH_URL`, etc.). Place secrets in a `.env` file for local development—variables are loaded automatically when present.
+- `ARTIFACT_ROOT`
+- `SSL_CERT_PATH`
+- `FIX_VERSION` (optional default)
+
+Optional overrides for Jira endpoints and path locations may be provided via environment variables that match the structure of `configs/config.yaml` (for example `JIRA_BASE_URL`, `JIRA_AUTH_URL`, etc.). Place secrets in a `.env` file for local development—variables are loaded automatically when present.
 
 ## Installation
 
@@ -35,28 +34,57 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## One-Time OAuth Setup
+## 🔐 Jira OAuth 3LO Authorization
 
-Run the authorization flow locally. This launches a browser window where you can complete the Jira login and grant permissions.
+The Release Intelligence tool now supports a fully automatic OAuth 3LO authorization flow.
 
-```bash
-# 1️⃣ Authorize Jira access (automatic browser launch)
-python -m modules.utils.oauth authorize
+### 1️⃣ Prerequisites
 
-# 2️⃣ If login fails or redirects to home.atlassian.com
-# Copy the code from the final URL (after ?code=) and run:
-python -m modules.utils.oauth complete <auth_code>
+Ensure your `.env` file includes the following values from your Atlassian Developer Console:
+
+```env
+JIRA_CLIENT_ID=<your_client_id>
+JIRA_CLIENT_SECRET=<your_client_secret>
+JIRA_REDIRECT_URI=http://localhost:8000/callback
+JIRA_BASE_URL=https://csaaig.atlassian.net
 ```
 
-This command stores tokens at the path specified by `JIRA_TOKEN_PATH` (default `~/.jira_token.json`). SSL verification honors `SSL_CERT_PATH`, and tokens are masked in logs.
+### 2️⃣ Run Authorization
 
-### Troubleshooting OAuth Login
+Run the following command:
 
-- If your corporate browser blocks redirects or incognito mode:
-  - Copy the printed URL from the console.
-  - Paste it into any browser where you are logged into Jira.
-  - When redirected to a blank or error page, copy the URL code (`?code=XYZ`).
-  - Run the `complete` command above to finish setup.
+```bash
+python -m modules.utils.oauth authorize
+```
+
+This will:
+
+- Launch your browser for Atlassian login
+- Capture the authorization code automatically from `http://localhost:8000/callback`
+- Exchange it for an access token
+- Save the token securely to `.secrets/jira_token.json`
+
+When successful, you’ll see:
+
+```
+✅ Authorization complete! Token saved to .secrets/jira_token.json
+```
+
+### 3️⃣ Token Reuse
+
+If a valid token already exists, the script will reuse it automatically and skip reauthorization:
+
+```
+✅ Existing Jira access token is still valid.
+```
+
+### 4️⃣ Manual Fallback (rare)
+
+If your environment blocks `localhost:8000` redirects, copy the code from the browser URL and run:
+
+```bash
+python -m modules.utils.oauth complete <auth_code>
+```
 
 ## Usage
 
@@ -119,11 +147,10 @@ pipeline focused on essential quality and reporting tasks.
 ### First Run
 - **Step 1:** Authenticate with Jira:
   ```bash
-  # 1️⃣ Authorize Jira access (automatic browser launch)
   python -m modules.utils.oauth authorize
-
-  # 2️⃣ If login fails or redirects to home.atlassian.com
-  # Copy the code from the final URL (after ?code=) and run:
+  ```
+- **Step 1b:** (Rare) If your device cannot receive the automatic callback, copy the `?code=` value from the browser and run:
+  ```bash
   python -m modules.utils.oauth complete <auth_code>
   ```
 - **Step 2:** Capture a snapshot and build the readiness report:
@@ -148,6 +175,35 @@ pipeline focused on essential quality and reporting tasks.
 - Validation logs under `/artifacts/validation/`
 - Reports under `/artifacts/reports/`
 - Sanitized logs under `/artifacts/logs/`
+
+### 🔒 Token Storage
+
+Tokens are stored automatically under `.secrets/jira_token.json` and excluded from version control. Do **not** commit this file. It contains your encrypted Jira OAuth credentials.
+
+## ⚠️ Troubleshooting OAuth Errors
+
+### `AccessDeniedError: (access_denied) Unauthorized`
+This occurs when Atlassian rejects the token exchange. Check:
+- Your `.env` file contains a valid `JIRA_CLIENT_SECRET`
+- The redirect URI matches **exactly** `http://localhost:8000/callback`
+- You authorized the correct scopes in your Atlassian app:
+  - `read:jira-work`
+  - `write:jira-work`
+  - `offline_access`
+- Re-run a fresh authorization (old codes expire after 10 minutes)
+
+### `client_secret may not be blank`
+- Ensure `.env` includes a non-empty `JIRA_CLIENT_SECRET`
+- Restart your terminal or run `source .env` before re-authorizing
+
+### Debug Logs
+Detailed logs and debug snapshots are written to:
+
+```
+/logs/oauth_debug_<timestamp>.json
+```
+
+Use these to inspect exact Atlassian responses for diagnostics.
 
 ### Next Steps
 - Begin manual QA per `/docs/test_plan_ship_phase.md`
