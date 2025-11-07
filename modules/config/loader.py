@@ -151,19 +151,28 @@ class ConfigLoader:
         return merged
 
     def _apply_environment_overrides(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        def _set(section: str, key: str, value: str) -> None:
+            section_values = config.setdefault(section, {})
+            if isinstance(section_values, MutableMapping):
+                section_values[key] = value
+                return
+            if isinstance(section_values, Mapping):
+                mutable_section = dict(section_values)
+                mutable_section[key] = value
+                config[section] = mutable_section
+                return
+            config[section] = {key: value}
+
+        scope_override = os.getenv("JIRA_SCOPES")
+        if scope_override:
+            _set("jira", "api_scope", scope_override)
+
         for (section, key), env_var in ENVIRONMENT_OVERRIDES.items():
             value = os.getenv(env_var)
             if value:
-                section_values = config.setdefault(section, {})
-                if isinstance(section_values, MutableMapping):
-                    section_values[key] = value
+                if env_var == "JIRA_API_SCOPE" and scope_override:
                     continue
-                if isinstance(section_values, Mapping):
-                    mutable_section = dict(section_values)
-                    mutable_section[key] = value
-                    config[section] = mutable_section
-                    continue
-                config[section] = {key: value}
+                _set(section, key, value)
         return config
 
     def _validate(self, config: Mapping[str, Any]) -> None:

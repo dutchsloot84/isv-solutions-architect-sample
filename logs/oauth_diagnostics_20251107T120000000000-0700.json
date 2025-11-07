@@ -1,0 +1,18 @@
+[
+  {
+    "timestamp": "2025-11-07T12:00:00-07:00",
+    "scopes": "read:issue:jira write:issue:jira read:project:jira offline_access",
+    "status_code": 403,
+    "error": "HTTPError('server error')",
+    "response": "{\"error\":\"access_denied\"}",
+    "retry_fallback": true
+  },
+  {
+    "timestamp": "2025-11-07T12:00:01-07:00",
+    "scopes": "read:issue:jira write:issue:jira read:project:jira",
+    "status_code": 200,
+    "error": null,
+    "response": "success",
+    "retry_fallback": true
+  }
+]

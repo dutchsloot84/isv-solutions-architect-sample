@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import threading
 import time
 import webbrowser
+from collections.abc import Iterable, Sequence
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -55,10 +57,100 @@ else:
 
 import requests
 
-from .helpers import load_config, project_root, resolve_path, ssl_verify_path
+from .helpers import ensure_directory, load_config, project_root, resolve_path, ssl_verify_path
 from .logger import get_logger
 
 LOGGER = get_logger(__name__)
+
+
+def _phoenix_now() -> datetime:
+    try:
+        tz = ZoneInfo("America/Phoenix") if ZoneInfo else timezone.utc
+    except Exception:  # pragma: no cover - fallback when timezone unavailable
+        tz = timezone.utc
+    return datetime.now(tz)
+
+
+def _phoenix_timestamp() -> str:
+    return _phoenix_now().strftime("%Y%m%dT%H%M%S%f%z")
+
+
+def _resolve_requested_scopes(config: dict) -> list[str]:
+    raw_scope = (
+        os.environ.get("JIRA_SCOPES")
+        or os.environ.get("JIRA_API_SCOPE")
+        or config.get("jira", {}).get("api_scope")
+        or ""
+    )
+    if isinstance(raw_scope, str):
+        scopes = [part for part in re.split(r"[\s,]+", raw_scope) if part]
+    elif isinstance(raw_scope, Iterable):
+        scopes = [str(part).strip() for part in raw_scope if str(part).strip()]
+    else:
+        scopes = []
+    return scopes
+
+
+def _scopes_to_oauthlib(scopes: Sequence[str]) -> list[str] | None:
+    return list(scopes) if scopes else None
+
+
+def _scopes_to_string(scopes: Sequence[str]) -> str:
+    return " ".join(scopes)
+
+
+_SENSITIVE_PATTERN = re.compile(
+    r"(\"(?:client_secret|refresh_token)\"\s*:\s*\")([^\"\\\n]+)"
+)
+
+
+def _mask_sensitive(value: str | None) -> str | None:
+    if not value:
+        return value
+
+    def _replacer(match: re.Match[str]) -> str:
+        prefix = match.group(1)
+        return f"{prefix}***"
+
+    masked = _SENSITIVE_PATTERN.sub(_replacer, value)
+    return masked
+
+
+class OAuthDiagnosticRecorder:
+    """Persist structured OAuth diagnostics for the current authorization run."""
+
+    def __init__(self, scopes: Sequence[str], logs_dir: Path | str | None = None) -> None:
+        self._entries: list[dict[str, object]] = []
+        base_dir = ensure_directory(logs_dir or Path("logs"))
+        self._scopes = list(scopes)
+        timestamp = _phoenix_timestamp()
+        self.path = Path(base_dir) / f"oauth_diagnostics_{timestamp}.json"
+
+    def log_attempt(
+        self,
+        *,
+        scopes: Sequence[str] | None = None,
+        status_code: int | None,
+        error: str | None,
+        response: str | None,
+        retry_fallback: bool,
+    ) -> None:
+        entry = {
+            "timestamp": _phoenix_now().isoformat(),
+            "scopes": _scopes_to_string(list(scopes) if scopes is not None else self._scopes),
+            "status_code": status_code,
+            "error": _mask_sensitive(error),
+            "response": _mask_sensitive(response),
+            "retry_fallback": retry_fallback,
+        }
+        self._entries.append(entry)
+        try:
+            self.path.write_text(
+                json.dumps(self._entries, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:  # noqa: BLE001 - diagnostics should not raise
+            LOGGER.debug("Failed to write OAuth diagnostic log", exc_info=True)
 
 
 class OAuthCallbackHandler(BaseHTTPRequestHandler):
@@ -107,14 +199,16 @@ class OAuthCallbackHandler(BaseHTTPRequestHandler):
         return
 
 
-def _build_oauth_session(config: dict, token: Optional[dict] = None) -> OAuth2Session:
+def _build_oauth_session(
+    config: dict, token: Optional[dict] = None, scopes: Optional[Sequence[str]] = None
+) -> OAuth2Session:
     """Create an OAuth2Session configured for Jira."""
     client_id = os.environ.get("JIRA_CLIENT_ID")
     if not client_id:
         raise RuntimeError("Environment variable JIRA_CLIENT_ID is required")
 
     redirect_uri = config["jira"].get("redirect_uri")
-    scope = config["jira"].get("api_scope")
+    resolved_scopes = _scopes_to_oauthlib(scopes if scopes is not None else _resolve_requested_scopes(config))
     token_url = config["jira"].get("token_url")
 
     secret = os.environ.get("JIRA_SECRET", "")
@@ -127,7 +221,7 @@ def _build_oauth_session(config: dict, token: Optional[dict] = None) -> OAuth2Se
         client_id=client_id,
         token=token,
         redirect_uri=redirect_uri,
-        scope=scope,
+        scope=resolved_scopes,
         auto_refresh_url=token_url,
         auto_refresh_kwargs=extra,
         token_updater=lambda t: save_token(t, config),
@@ -152,8 +246,22 @@ def save_token(token: dict, config: Optional[dict] = None) -> Path:
     """Persist the OAuth token to disk."""
     token_path = _resolve_token_path(config)
     token_path.parent.mkdir(parents=True, exist_ok=True)
+    payload = dict(token)
+    metadata: dict[str, str] = dict(payload.get("_metadata", {}))
+    metadata["saved_at"] = _phoenix_now().isoformat()
+    scope_value = token.get("scope")
+    scopes: list[str] = []
+    if isinstance(scope_value, str):
+        scopes = [part for part in scope_value.split() if part]
+    elif isinstance(scope_value, Iterable):
+        scopes = [str(part).strip() for part in scope_value if str(part).strip()]
+    if not scopes and config is not None:
+        scopes = _resolve_requested_scopes(config)
+    if scopes:
+        metadata["scopes"] = _scopes_to_string(scopes)
+    payload["_metadata"] = metadata
     with token_path.open("w", encoding="utf-8") as handle:
-        json.dump(token, handle, indent=2)
+        json.dump(payload, handle, indent=2)
     LOGGER.info("OAuth token saved to %s", token_path)
     return token_path
 
@@ -214,7 +322,13 @@ def authorize_jira() -> dict:
         or "api.atlassian.com"
     )
 
-    session = _build_oauth_session(config)
+    requested_scopes = _resolve_requested_scopes(config)
+    session = _build_oauth_session(config, scopes=requested_scopes)
+    current_scopes = list(requested_scopes)
+    offline_scope = "offline_access"
+    using_fallback_scopes = False
+    offline_requested = any(scope.lower() == offline_scope for scope in current_scopes)
+
     redirect_uri = config["jira"].get("redirect_uri")
     LOGGER.info(
         "Preparing Jira authorization request",
@@ -230,6 +344,7 @@ def authorize_jira() -> dict:
         auth_url,
         audience=audience,
         prompt="consent",
+        scope=_scopes_to_oauthlib(requested_scopes),
     )
 
     LOGGER.info("Starting local HTTP server to capture Jira OAuth callback")
@@ -271,6 +386,14 @@ def authorize_jira() -> dict:
         "home.atlassian.com, copy the URL you land on. If it contains '?code=XYZ', copy that "
         "code and run:\n\npython -m modules.utils.oauth complete <auth_code>\n"
     )
+
+    logs_dir_setting = config.get("paths", {}).get("logs_dir")
+    logs_dir_path = (
+        resolve_path(logs_dir_setting)
+        if logs_dir_setting
+        else project_root() / "logs"
+    )
+    diagnostic_recorder = OAuthDiagnosticRecorder(current_scopes, logs_dir_path)
 
     start_time = time.monotonic()
     fallback_notified = False
@@ -350,6 +473,8 @@ def authorize_jira() -> dict:
                     f"{authorization_code[:6]}***" if authorization_code else None
                 ),
                 "attempt": attempts,
+                "scopes": _scopes_to_string(current_scopes),
+                "using_fallback_scopes": using_fallback_scopes,
             }
             LOGGER.debug(diagnostic_payload)
             _write_oauth_debug_snapshot(diagnostic_payload)
@@ -360,6 +485,7 @@ def authorize_jira() -> dict:
                     auth=(client_id, client_secret),
                     include_client_id=False,
                     verify=str(verify_target) if verify_target else True,
+                    scope=_scopes_to_oauthlib(current_scopes),
                 )
             except Exception as error:  # noqa: BLE001 - propagate rich context
                 response = getattr(error, "response", None)
@@ -393,6 +519,13 @@ def authorize_jira() -> dict:
             }
             LOGGER.debug(success_payload)
             _write_oauth_debug_snapshot({**diagnostic_payload, **success_payload})
+            diagnostic_recorder.log_attempt(
+                scopes=current_scopes,
+                status_code=200,
+                error=None,
+                response="success",
+                retry_fallback=using_fallback_scopes,
+            )
             if attempts > 1:
                 LOGGER.info(
                     "Token exchange succeeded after %s attempts",
@@ -404,11 +537,62 @@ def authorize_jira() -> dict:
                     },
                 )
             break
-        except (
-            Exception
-        ) as error:  # noqa: BLE001 - propagate context for troubleshooting
+        except Exception as error:  # noqa: BLE001 - propagate context for troubleshooting
             response = getattr(error, "response", None)
             status_code = getattr(response, "status_code", None)
+            status_code_value = status_code if isinstance(status_code, int) else None
+            response_body = None
+            if response is not None:
+                try:
+                    response_body = response.text
+                except Exception:  # noqa: BLE001 - best-effort logging
+                    response_body = "<unable to read body>"
+            error_text = str(error)
+
+            fallback_candidate = (
+                offline_requested
+                and not using_fallback_scopes
+                and (
+                    (status_code_value in {401, 403})
+                    or (
+                        isinstance(response_body, str)
+                        and "access_denied" in response_body.lower()
+                    )
+                    or ("access_denied" in error_text.lower())
+                )
+            )
+
+            diagnostic_recorder.log_attempt(
+                scopes=current_scopes,
+                status_code=status_code_value,
+                error=error_text,
+                response=response_body,
+                retry_fallback=fallback_candidate,
+            )
+
+            if fallback_candidate:
+                fallback_scopes = [
+                    scope for scope in current_scopes if scope.lower() != offline_scope
+                ]
+                if not fallback_scopes:
+                    fallback_scopes = [
+                        scope for scope in requested_scopes if scope.lower() != offline_scope
+                    ]
+                current_scopes = fallback_scopes
+                using_fallback_scopes = True
+                LOGGER.warning(
+                    "⚠️ Atlassian rejected 'offline_access' scope — falling back to short-lived tokens.",
+                    extra={
+                        "event": "oauth_offline_scope_fallback",
+                        "slice_id": "07",
+                    },
+                )
+                print(
+                    "\n⚠️ Atlassian rejected 'offline_access' scope — falling back to short-lived tokens.\n"
+                )
+                session = _build_oauth_session(config, scopes=current_scopes)
+                continue
+
             should_retry = (
                 response is not None
                 and isinstance(status_code, int)
@@ -432,17 +616,12 @@ def authorize_jira() -> dict:
                 continue
 
             if response is not None:
-                body = None
-                try:
-                    body = response.text
-                except Exception:  # noqa: BLE001 - best-effort logging
-                    body = "<unable to read body>"
                 LOGGER.error(
                     "OAuth token exchange failed",
                     extra={
                         "event": "oauth_token_exchange_failure",
                         "status_code": response.status_code,
-                        "response_body": body,
+                        "response_body": response_body,
                         "slice_id": "07",
                     },
                 )
