@@ -129,9 +129,9 @@ def generate_delta() -> Tuple[Path, Dict[str, List[Dict]]]:
     delta = {
         "fixVersion": current_data.get("fixVersion"),
         "current_snapshot": current_path.name,
-        "previous_snapshot": latest_files[1].name
-        if len(latest_files) > 1
-        else None,
+        "previous_snapshot": (
+            latest_files[1].name if len(latest_files) > 1 else None
+        ),
         "counts": {key: len(value) for key, value in categories.items()},
         "items": categories,
     }
