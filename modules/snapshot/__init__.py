@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, Optional
+from typing import Dict, Iterable, Iterator, List, Mapping, Optional
 
 import requests
 
-from modules.fallback.csv_loader import load_csv_as_issues
+from modules.fallback.csv_loader import load_csv
 from modules.utils import helpers
 from modules.utils.http_retry import request_with_retry
 from modules.utils.logger import get_logger
@@ -59,7 +58,7 @@ def _detect_oauth_error(status_code: Optional[int], body: Optional[str]) -> bool
     return False
 
 
-def _fetch_jira_issues(fix_version: str) -> Iterable[Mapping[str, object]]:
+def _fetch_jira_issues(fix_version: str) -> Iterator[Mapping[str, object]]:
     config = helpers.load_config()
     deployment_field = config["project"].get(
         "deployment_notes_field", "customfield_12345"
@@ -144,14 +143,18 @@ def capture_snapshot(
     """Capture a snapshot either from Jira or a CSV fallback source."""
 
     if csv_path:
-        csv_path_obj = Path(csv_path).expanduser().resolve()
-        csv_issues = load_csv_as_issues(str(csv_path_obj))
-        metadata = {"csv_source": str(csv_path_obj)}
+        csv_result = load_csv(csv_path)
+        metadata = {
+            "csv_checksum": csv_result.checksum,
+            "csv_row_count": csv_result.row_count,
+            "csv_fieldnames": list(csv_result.fieldnames),
+            "csv_duration_seconds": round(csv_result.duration_seconds, 6),
+        }
         return builder.build_snapshot(
             fix_version=fix_version,
-            issues=csv_issues,
+            issues=csv_result.issues,
             mode="csv_fallback",
-            csv_file=str(csv_path_obj),
+            csv_file=str(csv_result.path),
             tz=tz,
             metadata=metadata,
         )

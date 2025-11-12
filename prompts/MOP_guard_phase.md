@@ -38,6 +38,9 @@ Ensure filenames include ISO 8601 timestamps where indicated and maintain consis
 - Mask secrets, tokens, OAuth refresh credentials, and PII before writing to stdout/stderr or stored logs.
 - Emit structured audit logs that capture timestamps, slice identifiers, branch names, and validation verdicts.
 - Centralize audit logs beneath `${ARTIFACT_ROOT}/logs/` with consistent naming.
+- When Jira OAuth is unavailable, ensure CSV fallback diagnostics (`logs/oauth_diagnostics_<timestamp>.json`) and audit reports
+  (`reports/audit_csv_fallback_auto_<timestamp>.md`) are captured with row counts, column headers, and SHA-256 checksums of the
+  supplied export.
 
 ## Success Criteria
 The Guard Phase is considered successful when all of the following hold:

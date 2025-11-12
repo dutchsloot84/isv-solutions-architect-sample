@@ -152,6 +152,8 @@ def test_capture_snapshot_csv_fallback(
     assert result.metadata["source"] == "csv_fallback"
     assert Path(result.metadata["csv_file"]).name == "export.csv"
     assert result.issues[0]["key"] == "ABC-3"
+    assert result.metadata["csv_row_count"] == 1
+    assert "csv_checksum" in result.metadata
 
     snapshot_path = snapshot.helpers.artifact_path(
         "snapshots", "snapshot_20240101T000000Z.json"
@@ -159,6 +161,7 @@ def test_capture_snapshot_csv_fallback(
     written = json.loads(snapshot_path.read_text(encoding="utf-8"))
     assert written["metadata"]["source"] == "csv_fallback"
     assert written["metadata"]["csv_file"].endswith("export.csv")
+    assert written["metadata"]["csv_row_count"] == 1
 
 
 def test_capture_snapshot_raises_when_oauth_unavailable(
