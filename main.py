@@ -94,12 +94,9 @@ def _prompt_for_csv(logger, tz: str | None) -> Path:
     print(
         "\n⚠️ OAuth unavailable — entering CSV fallback mode."
         "\nPlease export your Jira issues as CSV from your desired JQL view (e.g.,"
-        " project=MOB AND fixVersion=\"Mobilitas 2025.11.14\")."
+        ' project=MOB AND fixVersion="Mobilitas 2025.11.14").'
     )
-    print(
-        "Then place the file at"
-        f" {target_path} and press Enter to continue..."
-    )
+    print("Then place the file at" f" {target_path} and press Enter to continue...")
 
     while True:
         input()

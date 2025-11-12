@@ -114,4 +114,3 @@ def test_capture_snapshot_manual_override_records_trigger(
     diagnostics_path = Path(result.metadata["oauth_diagnostics"])
     diagnostics = json.loads(diagnostics_path.read_text(encoding="utf-8"))
     assert diagnostics["trigger"] == "manual_override"
-

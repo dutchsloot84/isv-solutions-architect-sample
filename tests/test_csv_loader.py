@@ -42,11 +42,12 @@ def test_load_csv_missing_file(tmp_path: Path) -> None:
         csv_loader.load_csv(str(tmp_path / "missing.csv"))
 
 
-def test_load_csv_warns_on_missing_headers(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+def test_load_csv_warns_on_missing_headers(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
     csv_path = tmp_path / "jira_partial.csv"
     csv_path.write_text(
-        "Issue key,Summary\n"
-        "ABC-3,Bad header\n",
+        "Issue key,Summary\n" "ABC-3,Bad header\n",
         encoding="utf-8",
     )
 
@@ -63,4 +64,7 @@ def test_load_csv_uses_golden_sample() -> None:
     assert result.row_count == 1
     assert result.issues[0]["key"] == "ABC-10"
     # Checksum is deterministic for audit reporting.
-    assert result.checksum == "5af2c48168aa8386198f11a1ddf20539e215e5e85a8fe1bab29ea4134ba9b2cb"
+    assert (
+        result.checksum
+        == "5af2c48168aa8386198f11a1ddf20539e215e5e85a8fe1bab29ea4134ba9b2cb"
+    )
